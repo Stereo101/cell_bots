@@ -80,9 +80,30 @@ class Simulation:
         self.bot_id_set = set()
         self.messages = []
 
+        self.bot_id_itr = 0
+
         self.recently_deceased = set()
         self.bot_code = {}
-        self.bot_id_counts = {}
+        self.bot_type_counts = {}
+
+        self.time = 0
+
+    def run(self):
+        self.print_summary()
+        while True:
+            self.tick()
+            self.print_summary()
+            input()
+
+    def print_summary(self):
+            print(f"{self.time}: ...")
+            print(self.bot_type_counts)
+            for bot in self.bot_grid.values():
+                print(f"{bot.bot_name} id:{bot.id} ip@{bot.instr_ptr}")
+                print(bot.coords)
+                print(bot.registers)
+                print()
+
 
     def add_bot_code(self,bot_name,instruction_list):
         self.bot_code[bot_name] = instruction_list
@@ -93,36 +114,34 @@ class Simulation:
             #bot is overlapping another bot, kill it
             self.kill(self.bot_grid[bot_obj.coords])
 
+        bot_obj.id = self.bot_id_itr
         self.bot_grid[bot_obj.coords] = bot_obj
-        self.bot_type_counts[bot_name] = self.bot_type_counts.get(bot_name,0) + 1
+        self.bot_type_counts[bot_obj.bot_name] = self.bot_type_counts.get(bot_obj.bot_name,0) + 1
         self.bot_id_itr += 1
         return self.bot_id_itr
 
     def register_message(self,message):
         self.messages.append(message)
-        pass 
 
     def kill(self,bot_obj):
         bot_obj.dead = True
-        self.recently_deceased[bot_obj.id] = bot_obj
-        self.bot_id_counts[bot_obj.bot_name] -= 1
+        self.recently_deceased.add(bot_obj.id)
+        self.bot_type_counts[bot_obj.bot_name] -= 1
         del self.bot_grid[bot_obj.coords]
 
 
     def tick(self):
-        #MESSAGES, CHECK, MOVE, CHECK
+        #check for message collision, move message, then check again
         i = 0
         while i < len(self.messages):
             mesg = self.messages[i]
             
-            #check for collision before moving
-            #   (will happen if a bot moves into a message)
+            #check for collision before moving -> bot moved into a message
             if mesg.coords in self.bot_grid:
                 self.bot_grid[mesg.coords].recv(mesg)
                 self.messages.pop(i)
                 continue
-            #move and check for collision again
-            #   (will happen if a message moves into a bot)
+            #move and check again -> message moved into a bot
             mesg.tick()
             if mesg.coords in self.bot_grid:
                 self.bot_grid[mesg.coords].recv(mesg)
@@ -130,24 +149,23 @@ class Simulation:
                 continue
             i += 1
 
-        #TICK BOTS IN ORDER
+        #Tick bots in order
+        for bot in list(self.bot_grid.values()):
+            if not bot.dead:
+                bot.tick()
 
-
-        #cull dead bots
-        for bot in self.bot_grid.values():
-            if bot.dead:
-                #TODO
-                pass
+        self.time += 1
 
         
 class Message:
-    def __init__(self,coords,velocity,value,simulation):
+    def __init__(self,coords,velocity,value,simulation,kill=False):
         self.coords = coords
         self.velocity = velocity
         assert len(coords) == len(velocity) 
         assert len(coords) == simulation.dimensions
         self.value = value
         self.id = simulation.register_message(self)
+        self.kill = kill
 
     def tick(self):
         self.coords = tuple(coords[i] + velocity[i] for i in range(coords)) 
@@ -156,21 +174,183 @@ class Cell_Bot:
     def __init__(self,bot_name,coords,simulation):
         assert bot_name in simulation.bot_code
         assert len(coords) == simulation.dimensions
+
+        self.bot_name = bot_name
         self.coords = coords
+        self.simulation = simulation
+
         self.instr_ptr = 0
         self.registers = [0]*simulation.register_count
         self.queue = []
         self.queue_size = 4
         self.ttl = 255
+        self.cond_state = False
+        self.waiting_for_mesg = False
+        self.dead = False
+        self.instruction_list = simulation.bot_code[self.bot_name].instructions
+        self.label_index = simulation.bot_code[self.bot_name].label_index
+        self.executed_inits = set()
+
+        #given by simulation when registered
+        self.id = None
         
     def tick(self):
-        instruction = simulation.bot_code[self.bot_name][instr_ptr]
+        if self.dead:
+            return
+        instruction = self.instruction_list[self.instr_ptr]
         self.execute(instruction)
+    
+    def die(self):
+        self.dead = True
+        self.simulation.kill(self)
+
+    def f_die(self,args=None):
+        assert len(args) == 0
+        self.die()
+
+    def f_add(self,args=None):
+        assert len(args) == 2
+        v = self.parse_source(args[0])
+        reg_index = args[1][1]
+        self.registers[reg_index] += v
+
+    def f_sub(self,args=None):
+        assert len(args) == 2
+        v = self.parse_source(args[0])
+        reg_index = args[1][1]
+        self.registers[reg_index] -= v
+
+    def f_mul(self,args=None):
+        assert len(args) == 2
+        v = self.parse_source(args[0])
+        reg_index = args[1][1]
+        self.registers[reg_index] *= v
+
+    def f_div(self,args=None):
+        assert len(args) == 3
+        v = self.parse_source(args[0])
+        div_reg_index = args[1][1]
+        remain_reg_index = args[1][2]
+        self.registers[remain_reg_index] = self.registers[div_reg_index] % v
+        self.registers[div_reg_index] //= v
+
+    def f_put(self,args=None):
+        assert len(args) == 2
+        v = self.parse_source(args[0])
+        reg_index = args[1][1]
+
+    def f_jmp(self,args=None):
+        assert len(args) == 1
+        label = args[0][1]
+        offset = self.label_index[label]
+        self.instr_ptr = offset
+
+    def f_jmpr(self,args=None):
+        assert len(args) == 1
+        pass
+
+    def f_ttl(self,args=None):
+        assert len(args) == 1
+        pass
+
+    def f_qmax(self,args=None):
+        assert len(args) == 1
+        pass
+
+    def f_tlt(self,args=None):
+        assert len(args) == 2
+        v1 = self.parse_source(args[0])
+        v2 = self.parse_source(args[1])
+        self.cond_state = v1 < v2
+
+    def f_tgt(self,args=None):
+        assert len(args) == 2
+        v1 = self.parse_source(args[0])
+        v2 = self.parse_source(args[1])
+        self.cond_state = v1 > v2
+
+    def f_teq(self,args=None):
+        assert len(args) == 2
+        v1 = self.parse_source(args[0])
+        v2 = self.parse_source(args[1])
+        self.cond_state = v1 == v2
+
+    def f_not(self,args=None):
+        assert len(args) == 1
+
+    def parse_source(self,src):
+        source_type = src[0]
+        if source_type == "I":
+            return src[1]
+        elif source_type == "R":
+            return self.registers[src[1]]
+        elif source_type == "Q":
+            #TODO
+            return 0
+        raise Exception("Unknown src " + source_type)
+
+    def recv(self,mesg):
+        if mesg.kill:
+            self.die()
+
+        if len(self.queue) < self.queue_size:
+            self.queue.insert(0,mesg.value)
+            return True
+        return False
 
     def execute(self,instruction):
-        pass
+        #dont inc pointer after jmp
+        skip_inc_ip = "jmp" in instruction.instr_type
+        print(instruction)
+
         
+        f = getattr(self,"f_" + instruction.instr_type) 
+        f(args=instruction.args)
+
+        if instruction.is_init:
+            self.executed_inits.add(self.instr_ptr)
         
+        #finally increment instr ptr 
+        if not skip_inc_ip:
+            self.adv_ip()
+
+        #find next valid instruction
+        start = self.instr_ptr
+        while True:
+            next_instr = self.instruction_list[self.instr_ptr]
+            if ((next_instr.is_init and self.instr_ptr in self.executed_inits) or (next_instr.is_cond and next_instr.cond_type != self.cond_state)):
+                self.adv_ip()
+                if self.instr_ptr == start:
+                    self.die()
+                    break
+                continue
+            break
+    def adv_ip(self):
+        self.instr_ptr += 1 
+        if self.instr_ptr >= len(self.instruction_list):
+            self.instr_ptr = 0
+
+        
+#struct to hold information about a single instruction
+
+class Action: #lawsuit
+    def __init__(self,instr_type, args, cond_type=None, is_init=False):
+        self.instr_type = instr_type
+        self.args = args
+        self.cond_type = cond_type
+        self.is_init = is_init
+        self.is_cond = cond_type is not None
+
+    def __repr__(self):
+        if self.cond_type is not None and self.is_init:
+            return f"@{'+' if self.cond_type else '-'}{self.instr_type} {self.args}"
+        elif self.cond_type is not None:
+            return f"{'+' if self.cond_type else '-'}{self.instr_type} {self.args}"
+        elif self.is_init:
+            return f"@{self.instr_type} {self.args}"
+        else:
+            return f"{self.instr_type} {self.args}"
+
 class Instruction_Set:
     instr_args = {
         "put":  [{"R","I","Q"},{"R","DIR"}],
@@ -212,7 +392,8 @@ class Instruction_Set:
     #simple parser, doesn't check for poor BOT names or LABEL names
     #   not all errors will be caught and explained
     def compile(self,code):
-        final_instr_list = []
+        self.raw_code = code
+        instr_list = []
         tokenize_regex = r"\s+"
 
         #regex for matching different kinds of args
@@ -225,7 +406,6 @@ class Instruction_Set:
         label_offsets = {}
                 
         line_number = -1
-        code_line_number = -1
         for line in code:
             #always increment line_number
             line_number += 1
@@ -253,7 +433,7 @@ class Instruction_Set:
                     print(f"Error on line {line_number}:")
                     print('"'," ".join(line_symbols),'"')
                     print(f"2nd definition of label '{label}'")
-                    raise Exception("Compilation error")
+                    raise Exception("Compilation Error")
                 label_offsets[label] = line_number
                 symbol_offset += 1
             
@@ -289,7 +469,7 @@ class Instruction_Set:
                 print(f"Error on line {line_number}:")
                 print('"'," ".join(line_symbols),'"')
                 print(f"Unimplemented instruction '{instr_type}'")
-                raise Exception("Compilation error")
+                raise Exception("Compilation Error")
 
             #verify arg count and ensure they match regex 
             expected_args = self.instr_args[instr_type]
@@ -302,7 +482,7 @@ class Instruction_Set:
                 print('"'," ".join(line_symbols),'"')
                 print(f"Instruction '{instr_type}' expects {expected_arg_count} arguments.")
                 print(f"\tsyntax: {instr_type} {expected_args}")
-                raise Exception("Compilation error")
+                raise Exception("Compilation Error")
 
             while arg_offset < expected_arg_count:
                 #get next token
@@ -376,7 +556,7 @@ class Instruction_Set:
                 print('"'," ".join(line_symbols),'"')
                 print(f"Instruction '{instr_type}' expects {expected_arg_count} arguments, but only {arg_offset+1} were given")
                 print(f"\tsyntax: {instr_type} {expected_args}")
-                raise Exception("Compilation error")
+                raise Exception("Compilation Error")
 
             #ensure if there are remaining symbols, the next one starts with an '#' as to start a comment
             symbol_offset += 1
@@ -386,15 +566,45 @@ class Instruction_Set:
                     print('"'," ".join(line_symbols),'"')
                     print(f"Instruction '{instr_type}' expects {expected_arg_count} arguments, but more were given")
                     print(f"\tsyntax: {instr_type} {expected_args}")
-                    raise Exception("Compilation error")
-                    
-            print(instr_type,args)
-                
-                
-                
-                
+                    raise Exception("Compilation Error")
+            act = Action(instr_type,args,cond_type=cond_line_type,is_init=is_init_line)
+            instr_list.append([line_number,act]) 
+            print(act)
+    
+
+        #mangle label index from raw line numbers to compiled line number
+        for label in label_offsets.keys():
+            index = label_offsets[label]
+            #find first instruction >= label index
+            instr_offset = 0
+            while instr_offset < len(instr_list) and instr_list[instr_offset][0] < index:
+                instr_offset += 1
+            
+            if instr_offset == len(instr_list):
+                #set trailing labels to jump to start
+                label_offsets[label] = 0
+            else:
+                label_offsets[label] = instr_offset
+
+        #get rid of raw line numbers now that labels are adjusted
+        instr_list = [x for _,x in instr_list]
+        print(label_offsets)
+
+        #check that labels actually exist
+        for instr in instr_list:
+            for arg_tup in instr.args:
+                arg_type,arg,*_ = arg_tup
+                if arg_type == "LABEL" and arg not in label_offsets: 
+                    print(f"Error in instruction '{instr}'")
+                    print(f"label '{arg}' was never defined")
+                    raise Exception("Compilation Error")
+
+        self.instructions = instr_list
+        self.label_index = label_offsets
+        return
 
 def test_bad_bots():
+    import os
     bot_code_dir = "bad_bots"
     for bot in os.listdir(bot_code_dir):
         try:
@@ -404,6 +614,8 @@ def test_bad_bots():
             instr.load(bot_fp)
         except Exception as e:
             print("error while compiling",bot,":",e)
+            if "Compilation Error" not in str(e):
+                raise e
         print()
 
 
@@ -413,15 +625,23 @@ def main():
     sim = Simulation(register_count=2,dimensions=2)
     bot_code_dir = "bots"
     for bot in os.listdir(bot_code_dir):
+        bot_name = bot.split(".")[0]
         try:
             print("compiling",bot)
             bot_fp = os.path.join(bot_code_dir,bot)
             instr = Instruction_Set()
             instr.load(bot_fp)
-            print("success")
+            print(f"compiled {bot} successfully.")
+            sim.add_bot_code(bot_name,instr)
         except Exception as e:
             print("error while compiling",bot,":",e)
+            if e != "Compilation Error":
+                raise e
         print()
+    main_bot = Cell_Bot("count_to_ten",(0,0),sim)
+    #def __init__(self,bot_name,coords,simulation):
+    sim.register_bot(main_bot)
+    sim.run()
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,6 @@
+@put 1 r0
+l:  put r0 X+
+    tgt r0 10
+    +jmp end
+    -jmp l
+end: die
