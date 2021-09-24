@@ -1,0 +1,16 @@
+#line starting with '#' are comments they are ignored
+#@ is the initializer symbol, it will only be executed once
+@put 1 r1
+
+#leading whitespace should also be ignored
+        put r1 X+
+        add 1 r1
+        tgt r1 10
+
+#conditional will be executed if COND is set
+#otherwise they will be stepped over
++die
+
+#blank lines are ignored
+
+#cell bots will loop if they get to the end of their listing

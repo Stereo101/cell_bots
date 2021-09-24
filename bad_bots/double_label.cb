@@ -1,0 +1,2 @@
+a: put 0 r1
+a: put r1 X+
