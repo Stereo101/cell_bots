@@ -160,7 +160,7 @@ class Cell_Bot:
         self.instr_ptr = 0
         self.registers = [0]*simulation.register_count
         self.queue = []
-        self.queue_size = 255
+        self.queue_size = 4
         self.ttl = 255
         
     def tick(self):
@@ -193,6 +193,7 @@ class Instruction_Set:
 
         "count":[{"BOT"},{"R","DIR"}],
         "spawn":[{"BOT"},{"DIR"}],
+        
         "fork": [{"DIR"}],
         "kill": [{"DIR"}],
         "die":  []
@@ -208,8 +209,8 @@ class Instruction_Set:
             code = code_fp.readlines()
         self.compile(code)
 
-    #this is a simple assembler
-    #   doesn't check for perverted exploits of the syntax
+    #simple parser, doesn't check for poor BOT names or LABEL names
+    #   not all errors will be caught and explained
     def compile(self,code):
         final_instr_list = []
         tokenize_regex = r"\s+"
@@ -293,7 +294,7 @@ class Instruction_Set:
             #verify arg count and ensure they match regex 
             expected_args = self.instr_args[instr_type]
             expected_arg_count = len(expected_args)
-            #print(instr_type,expected_args)
+
             arg_offset = 0
             args = []
             if expected_arg_count > len(line_symbols)-symbol_offset:
@@ -308,7 +309,7 @@ class Instruction_Set:
                 symbol_offset += 1
                 current_symbol = line_symbols[symbol_offset]
            
-                #stop if we hit a commnet 
+                #stop if we hit a comment 
                 if current_symbol.startswith("#"):
                     break
 
@@ -385,6 +386,7 @@ class Instruction_Set:
                     print('"'," ".join(line_symbols),'"')
                     print(f"Instruction '{instr_type}' expects {expected_arg_count} arguments, but more were given")
                     print(f"\tsyntax: {instr_type} {expected_args}")
+                    raise Exception("Compilation error")
                     
             print(instr_type,args)
                 
