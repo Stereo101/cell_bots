@@ -185,11 +185,13 @@ class Cell_Bot:
         self.queue_size = 4
         self.ttl = 255
         self.cond_state = False
-        self.waiting_for_mesg = False
         self.dead = False
         self.instruction_list = simulation.bot_code[self.bot_name].instructions
         self.label_index = simulation.bot_code[self.bot_name].label_index
         self.executed_inits = set()
+
+        self.waiting_for_mesg = False
+        self.arg_buffer = [0]*4
 
         #given by simulation when registered
         self.id = None
@@ -204,94 +206,118 @@ class Cell_Bot:
         self.dead = True
         self.simulation.kill(self)
 
-    def f_die(self,args=None):
+    def f_die(self,args=None,srcs=None):
         assert len(args) == 0
         self.die()
 
-    def f_add(self,args=None):
+    def f_add(self,args=None,srcs=None):
         assert len(args) == 2
-        v = self.parse_source(args[0])
         reg_index = args[1][1]
-        self.registers[reg_index] += v
+        self.registers[reg_index] += srcs[0]
 
-    def f_sub(self,args=None):
+    def f_sub(self,args=None,srcs=None):
         assert len(args) == 2
-        v = self.parse_source(args[0])
         reg_index = args[1][1]
-        self.registers[reg_index] -= v
+        self.registers[reg_index] -= srcs[0]
 
-    def f_mul(self,args=None):
+    def f_mul(self,args=None,srcs=None):
         assert len(args) == 2
-        v = self.parse_source(args[0])
         reg_index = args[1][1]
-        self.registers[reg_index] *= v
+        self.registers[reg_index] *= srcs[0]
 
-    def f_div(self,args=None):
+    def f_div(self,args=None,srcs=None):
         assert len(args) == 3
-        v = self.parse_source(args[0])
         div_reg_index = args[1][1]
         remain_reg_index = args[1][2]
-        self.registers[remain_reg_index] = self.registers[div_reg_index] % v
-        self.registers[div_reg_index] //= v
+        self.registers[remain_reg_index] = self.registers[div_reg_index] % srcs[0]
+        self.registers[div_reg_index] //= srcs[0]
 
-    def f_put(self,args=None):
+    def f_put(self,args=None,srcs=None):
         assert len(args) == 2
-        v = self.parse_source(args[0])
-        reg_index = args[1][1]
+        print(args)
+        if args[1][0] == "DIR":
+            print("shooting message",srcs[0],"".join(args[1][1:]))
+        else:
+            reg_index = args[1][1]
+            self.registers[reg_index] = srcs[0]
 
-    def f_jmp(self,args=None):
+    def f_jmp(self,args=None,srcs=None):
         assert len(args) == 1
         label = args[0][1]
         offset = self.label_index[label]
         self.instr_ptr = offset
 
-    def f_jmpr(self,args=None):
+    def f_jmpr(self,args=None,srcs=None):
         assert len(args) == 1
         pass
 
-    def f_ttl(self,args=None):
+    def f_ttl(self,args=None,srcs=None):
         assert len(args) == 1
         pass
 
-    def f_qmax(self,args=None):
+    def f_qmax(self,args=None,srcs=None):
         assert len(args) == 1
         pass
 
-    def f_tlt(self,args=None):
+    def f_tlt(self,args=None,srcs=None):
         assert len(args) == 2
-        v1 = self.parse_source(args[0])
-        v2 = self.parse_source(args[1])
-        self.cond_state = v1 < v2
+        self.cond_state = srcs[0] < srcs[1]
 
-    def f_tgt(self,args=None):
+    def f_tgt(self,args=None,srcs=None):
         assert len(args) == 2
-        v1 = self.parse_source(args[0])
-        v2 = self.parse_source(args[1])
-        self.cond_state = v1 > v2
+        self.cond_state = srcs[0] > srcs[1]
 
-    def f_teq(self,args=None):
+    def f_teq(self,args=None,srcs=None):
         assert len(args) == 2
-        v1 = self.parse_source(args[0])
-        v2 = self.parse_source(args[1])
-        self.cond_state = v1 == v2
+        self.cond_state = srcs[0] == srcs[1]
 
-    def f_not(self,args=None):
+    def f_not(self,args=None,srcs=None):
         assert len(args) == 1
 
-    def parse_source(self,src):
-        source_type = src[0]
-        if source_type == "I":
-            return src[1]
-        elif source_type == "R":
-            return self.registers[src[1]]
-        elif source_type == "Q":
-            #TODO
-            return 0
-        raise Exception("Unknown src " + source_type)
+    def parse_source(self,args):
+        #If we are in the waiting state, check
+        if self.waiting_for_mesg:
+            if self.remaining_args != 0:
+                #We can have enough args to execute the instr
+                return True,[]
+        else:
+            #place items from queue into arg buffer
+            print(args)
+            q_args = sum(1 for a in args if a[0] == "Q")
+            while q_args > 0 and len(self.queue) > 0:
+                self.arg_buffer.append(self.queue.pop())
+                q_args -= 1
+            if q_args != 0:
+                #Couldn't fill args from, Q, enter waiting state
+                self.remaining_args = q_args
+                self.waiting_for_mesg = True
+                return True,[]
+                
+            
+        ret = []
+        print(args)
+        print(list(args))
+        for arg in args:
+            source_type = arg[0]
+            if source_type == "I":
+                ret.append(arg[1])
+            elif source_type == "R":
+                ret.append(self.registers[arg[1]])
+            elif source_type == "Q":
+                ret.append(self.arg_buffer.pop(0))
+            else:
+                raise Exception("UNKNOWN SRC TYPE: " + source_type)
+        return False,ret
+            
 
     def recv(self,mesg):
         if mesg.kill:
             self.die()
+        
+        if self.waiting_for_mesg and self.remaining_args > 0:
+            self.remaining_args -= 1
+            self.arg_buffer.append(mesg.value)
+            return True
 
         if len(self.queue) < self.queue_size:
             self.queue.insert(0,mesg.value)
@@ -303,9 +329,20 @@ class Cell_Bot:
         skip_inc_ip = "jmp" in instruction.instr_type
         print(instruction)
 
-        
+        #Check if we can actually fetch src's from Q 
+        instr_arg_template = Instruction_Set.instr_args[instruction.instr_type] 
+        print("arg_template",instr_arg_template)
+        src_arg_indexs = [i for i in range(len(instr_arg_template)) if "src_" in instr_arg_template[i][0]]
+        print("src_indexs",src_arg_indexs)
+        src_args = [instruction.args[index] for index in src_arg_indexs]
+        print("src_list",src_args)
+        enter_wait,ret = self.parse_source(src_args)
+        if enter_wait:
+            return
+
+        print("ret",ret)
         f = getattr(self,"f_" + instruction.instr_type) 
-        f(args=instruction.args)
+        f(args=instruction.args,srcs=ret)
 
         if instruction.is_init:
             self.executed_inits.add(self.instr_ptr)
@@ -353,29 +390,47 @@ class Action: #lawsuit
 
 class Instruction_Set:
     instr_args = {
-        "put":  [{"R","I","Q"},{"R","DIR"}],
-        "add":  [{"R","I","Q"},{"R","DIR"}],
-        "sub":  [{"R","I","Q"},{"R","DIR"}],
-        "mul":  [{"R","I","Q"},{"R","DIR"}],
-        "div":  [{"R","I","Q"},{"R","DIR"},{"R","DIR"}],
+        "put":  [   ("src_0",{"R","I","Q"}),
+                    ("dst_0",{"R","DIR"})],
 
-        "tgt":  [{"R","I","Q"},{"R","I","Q"}],
-        "teq":  [{"R","I","Q"},{"R","I","Q"}],
-        "tlt":  [{"R","I","Q"},{"R","I","Q"}],
+        "add":  [   ("src_0",{"R","I","Q"}),
+                    ("dst_0",{"R","DIR"})],
+
+        "sub":  [   ("src_0",{"R","I","Q"}),
+                    ("dst_0",{"R","DIR"})],
+
+        "mul":  [   ("src_0",{"R","I","Q"}),
+                    ("dst_0",{"R","DIR"})],
+
+        "div":  [   ("src_0",{"R","I","Q"}),
+                    ("dst_0",{"R","DIR"}),
+                    ("dst_1",{"R","DIR"})],
+
+        "tgt":  [   ("src_0",{"R","I","Q"}),
+                    ("src_1",{"R","I","Q"})],
+
+        "teq":  [   ("src_0",{"R","I","Q"}),
+                    ("src_1",{"R","I","Q"})],
+
+        "tlt":  [   ("src_0",{"R","I","Q"}),
+                    ("src_1",{"R","I","Q"})],
         
-        "qmax": [{"R","I","Q"}],
-        "ttl":  [{"R","I","Q"}],
-        "jmpr": [{"R","I","Q"}],
+        "qmax": [   ("src_0",{"R","I","Q"})],
+        "ttl":  [   ("src_0",{"R","I","Q"})],
+        "jmpr": [   ("src_0",{"R","I","Q"})],
 
-        "jmp":  [{"L"}],
-        "not":  [{"R"}],
-        "id":   [{"R","DIR"}],
+        "jmp":  [   ("src_0",{"L"})],
+        "not":  [   ("dst_0",{"R"})],
+        "id":   [   ("dst_0",{"R","DIR"})],
 
-        "count":[{"BOT"},{"R","DIR"}],
-        "spawn":[{"BOT"},{"DIR"}],
+        "count":[   ("src_0",{"BOT"}),
+                    ("dst_0",{"R","DIR"})],
+
+        "spawn":[   ("src_0",{"BOT"}),
+                    ("dst_0",{"DIR"})],
         
-        "fork": [{"DIR"}],
-        "kill": [{"DIR"}],
+        "fork": [   ("src_0",{"DIR"})],
+        "kill": [   ("src_0",{"DIR"})],
         "die":  []
     }
   
@@ -495,7 +550,8 @@ class Instruction_Set:
 
                 #ensure arg matches one of the expected inputs
                 matched = False
-                for arg_type in expected_args[arg_offset]:
+                
+                for arg_type in expected_args[arg_offset][1]:
                     if arg_type == "R":
                         m = re.match(register_regex,current_symbol)
                         if m:
@@ -558,7 +614,7 @@ class Instruction_Set:
                 print(f"\tsyntax: {instr_type} {expected_args}")
                 raise Exception("Compilation Error")
 
-            #ensure if there are remaining symbols, the next one starts with an '#' as to start a comment
+            #ensure if there are remaining symbols, the ensure next one starts with an '#' as to start a comment
             symbol_offset += 1
             if symbol_offset < len(line_symbols):
                 if not line_symbols[symbol_offset].startswith("#"):
