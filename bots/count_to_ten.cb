@@ -4,7 +4,7 @@
 
 #leading whitespace should also be ignored
         put r1 X+
-        add 1 r1
+        add 1 r1 r1
         tgt r1 10
 
 #conditional will be executed if COND is set

@@ -1,0 +1,3 @@
+spawn wait_and_return X+
+put Q r0
+die

@@ -1,73 +1,5 @@
 import re
 
-#Cell bot operations
-#
-#Bot limitations
-#   some # of R/W registers that hold numbers
-#   conditional flag
-#   a TTL register that is only writable (default/max 255)
-#   a FIFO QUEUE_MAX (default/max 255)
-#
-#INSTRUCTION LISTING
-#   put src:R/I/Q dst:R/DIR
-#   add src:R/I/Q dst:R/DIR
-#   sub src:R/I/Q dst:R/DIR
-#   mul src:R/I/Q dst:R/DIR
-#   div src:R/I/Q result_dst:R/DIR mod_dst:R/DIR
-#
-#   tgt R/I/Q R/I/Q     test greater than
-#   tlt R/I/Q R/I/Q     test less than
-#   teq R/I/Q R/I/Q     test equal to
-#
-#   qmax R/I/DIR        set max queue size [0-255]
-#   ttl R/I/DIR         set message ttl [0-255] where 0 means infinite TTL
-#
-#   jmp LABEL
-#   jmpr R/I/Q
-#   not R
-#   id R
-#   count BOT_NAME dst:R/DIR
-#
-#   spawn BOT_NAME DIR
-#   fork DIR
-#   kill DIR
-#   move DIR
-#   look DIR
-#
-#   die
-#
-#null is a valid register
-#
-#DIR should be of form AXIS(+/-)
-#   ie X+ X- Y+ Y- Z+ Z-
-#   allow for arbitrary number of dimensions
-#   D0+ is the same as X+
-#
-#   
-#   ?messages can move in multiple directions at once?
-#
-#spawning or forking another bot into an occupied space
-#   will overwrite the previous bot 
-#
-#moving into an already occupied space will cause the move to fail
-#moving sets the conditional register based on success
-#
-#writing to DIR will spawn a message moving in space
-#messages move 1 space per tick in the direction they are fired
-#when a message overlaps a bot, it is added to their message queue, the message is destroyed
-#reading from an empty queue will cause the bot to hang until a message is recieved
-#
-#
-#messages can pass through each other
-#messages die when their TTL expires (or never do if TTL was set to 0)
-#
-#invalid instructions cause bot death (div 0,
-#
-#TURN PRIORITY
-#messages are moved based on age (older = firster)
-#bots code is ticked forward executed based on age (older = firster)
-#bots killed before their turn don't execute anything
-
 class Simulation:
     def __init__(self,dimensions,register_count):
         self.dimensions = dimensions
@@ -93,16 +25,26 @@ class Simulation:
         while True:
             self.tick()
             self.print_summary()
+            if len(self.bot_grid) == 0:
+                break
             input()
+        print("Done.")
 
     def print_summary(self):
-            print(f"{self.time}: ...")
-            print(self.bot_type_counts)
+            print(f"Step {self.time}:")
+            
+            print(f"________________\n")
+            """
+            print("Bot Counts")
+            for bot_name,count in self.bot_type_counts.items():
+                if count > 0:
+                    print(f"\t{bot_name}: {count} alive.")
+            print()
+            """
+            print("Bot Listing")
             for bot in self.bot_grid.values():
-                print(f"{bot.bot_name} id:{bot.id} ip@{bot.instr_ptr}")
-                print(bot.coords)
-                print(bot.registers)
-                print()
+                print(f"\t{bot.bot_name} id:{bot.id} ip@{bot.instr_ptr} R:{bot.registers} Q:{bot.queue} coords:{bot.coords}")
+            print("_________________\n\n")
 
 
     def add_bot_code(self,bot_name,instruction_list):
@@ -207,72 +149,90 @@ class Cell_Bot:
         self.simulation.kill(self)
 
     def f_die(self,args=None,srcs=None):
-        assert len(args) == 0
         self.die()
 
     def f_add(self,args=None,srcs=None):
-        assert len(args) == 2
-        reg_index = args[1][1]
-        self.registers[reg_index] += srcs[0]
+        add_result = srcs[0] + srcs[1]
+        self.handle_dst(args[2],add_result)
 
     def f_sub(self,args=None,srcs=None):
-        assert len(args) == 2
-        reg_index = args[1][1]
-        self.registers[reg_index] -= srcs[0]
+        sub_result = srcs[0] - srcs[1]
+        self.handle_dst(args[2],sub_result)
 
     def f_mul(self,args=None,srcs=None):
-        assert len(args) == 2
-        reg_index = args[1][1]
-        self.registers[reg_index] *= srcs[0]
+        mult_result = srcs[0] * srcs[1]
+        self.handle_dst(args[2],mult_result)
 
     def f_div(self,args=None,srcs=None):
-        assert len(args) == 3
-        div_reg_index = args[1][1]
-        remain_reg_index = args[1][2]
-        self.registers[remain_reg_index] = self.registers[div_reg_index] % srcs[0]
-        self.registers[div_reg_index] //= srcs[0]
+        div_result = srcs[0] // srcs[1]
+        mod_result = srcs[0] % srcs[1]
+        self.handle_dst(args[2],div_result)
+        self.handle_dst(args[3],mod_result)
 
     def f_put(self,args=None,srcs=None):
-        assert len(args) == 2
-        print(args)
-        if args[1][0] == "DIR":
-            print("shooting message",srcs[0],"".join(args[1][1:]))
-        else:
-            reg_index = args[1][1]
-            self.registers[reg_index] = srcs[0]
+        self.handle_dst(args[1],srcs[0])
 
     def f_jmp(self,args=None,srcs=None):
-        assert len(args) == 1
         label = args[0][1]
         offset = self.label_index[label]
         self.instr_ptr = offset
 
     def f_jmpr(self,args=None,srcs=None):
-        assert len(args) == 1
         pass
 
     def f_ttl(self,args=None,srcs=None):
-        assert len(args) == 1
         pass
 
     def f_qmax(self,args=None,srcs=None):
-        assert len(args) == 1
-        pass
+        self.qmax = srcs[0]
 
     def f_tlt(self,args=None,srcs=None):
-        assert len(args) == 2
         self.cond_state = srcs[0] < srcs[1]
 
     def f_tgt(self,args=None,srcs=None):
-        assert len(args) == 2
         self.cond_state = srcs[0] > srcs[1]
 
     def f_teq(self,args=None,srcs=None):
-        assert len(args) == 2
         self.cond_state = srcs[0] == srcs[1]
 
     def f_not(self,args=None,srcs=None):
-        assert len(args) == 1
+        register_index = args[0][1]
+        if self.registers[register_index] == 0:
+            self.registers[register_index] == 1
+        else:
+            self.registers[register_index] == 0
+
+    def f_spawn(self,args=None,srcs=None):
+        bot_name = srcs[0]
+        position = self.coords
+        direction = self.dir_to_coords(args[1])
+        position = tuple(position[i] + direction[i] for i in range(len(position)))
+        print(f"Spawning {bot_name} @ {position}")
+        new_bot = Cell_Bot(bot_name,position,self.simulation)
+        self.simulation.register_bot(new_bot)
+        
+    def handle_dst(self,arg_info,value):
+        arg_type = arg_info[0]
+        if arg_type == "DIR":
+            #spawn a new message
+            direction = self.dir_to_coords(arg_info)
+            spawn_location = tuple(direction[i] + self.coords[i] for i in range(len(self.coords))) 
+            new_mesg = Message(spawn_location,direction,value,self.simulation,kill=(value == "KILL"))
+            self.simulation.register_message(new_mesg)
+            
+        elif arg_type == "R":
+            register_index = arg_info[1]
+            self.registers[register_index] = value
+        else:
+            raise Error(f"Unknown dst type: {arg_info}")
+
+    def dir_to_coords(self,direction_arg):
+        coords = [0]*self.simulation.dimensions
+        dim = direction_arg[1]
+        positive_direction = direction_arg[2] == "+"
+        coords[dim] = 1 if positive_direction else -1
+        return tuple(coords)
+        
 
     def parse_source(self,args):
         #If we are in the waiting state, check
@@ -282,7 +242,6 @@ class Cell_Bot:
                 return True,[]
         else:
             #place items from queue into arg buffer
-            print(args)
             q_args = sum(1 for a in args if a[0] == "Q")
             while q_args > 0 and len(self.queue) > 0:
                 self.arg_buffer.append(self.queue.pop())
@@ -295,8 +254,6 @@ class Cell_Bot:
                 
             
         ret = []
-        print(args)
-        print(list(args))
         for arg in args:
             source_type = arg[0]
             if source_type == "I":
@@ -305,6 +262,10 @@ class Cell_Bot:
                 ret.append(self.registers[arg[1]])
             elif source_type == "Q":
                 ret.append(self.arg_buffer.pop(0))
+            elif source_type == "BOT":
+                ret.append(arg[1])
+            elif source_type == "LABEL":
+                ret.append(arg[1])
             else:
                 raise Exception("UNKNOWN SRC TYPE: " + source_type)
         return False,ret
@@ -327,21 +288,18 @@ class Cell_Bot:
     def execute(self,instruction):
         #dont inc pointer after jmp
         skip_inc_ip = "jmp" in instruction.instr_type
-        print(instruction)
 
         #Check if we can actually fetch src's from Q 
         instr_arg_template = Instruction_Set.instr_args[instruction.instr_type] 
-        print("arg_template",instr_arg_template)
         src_arg_indexs = [i for i in range(len(instr_arg_template)) if "src_" in instr_arg_template[i][0]]
-        print("src_indexs",src_arg_indexs)
         src_args = [instruction.args[index] for index in src_arg_indexs]
-        print("src_list",src_args)
         enter_wait,ret = self.parse_source(src_args)
         if enter_wait:
             return
 
-        print("ret",ret)
+        assert len(instruction.args) == len(Instruction_Set.instr_args[instruction.instr_type])
         f = getattr(self,"f_" + instruction.instr_type) 
+
         f(args=instruction.args,srcs=ret)
 
         if instruction.is_init:
@@ -394,15 +352,19 @@ class Instruction_Set:
                     ("dst_0",{"R","DIR"})],
 
         "add":  [   ("src_0",{"R","I","Q"}),
+                    ("src_1",{"R","I","Q"}),
                     ("dst_0",{"R","DIR"})],
 
         "sub":  [   ("src_0",{"R","I","Q"}),
+                    ("src_1",{"R","I","Q"}),
                     ("dst_0",{"R","DIR"})],
 
         "mul":  [   ("src_0",{"R","I","Q"}),
+                    ("src_1",{"R","I","Q"}),
                     ("dst_0",{"R","DIR"})],
 
         "div":  [   ("src_0",{"R","I","Q"}),
+                    ("src_1",{"R","I","Q"}),
                     ("dst_0",{"R","DIR"}),
                     ("dst_1",{"R","DIR"})],
 
@@ -472,28 +434,36 @@ class Instruction_Set:
 
             line_symbols = re.split(tokenize_regex,line.strip())
             
+            current_symbol = line_symbols[symbol_offset] 
             #skip empty lines
-            if len(line_symbols) == 0 or line_symbols[0] == "":
+            if len(line_symbols) == 0 or current_symbol == "":
                 continue
             
             #skip comments
-            if line_symbols[0].startswith("#"):
+            if current_symbol.startswith("#"):
                 continue
             #print(line_symbols)
 
             #check for a label
-            if line_symbols[0].endswith(":"):
-                label = line_symbols[0][:-1]
+            if ":" in current_symbol:
+                label = current_symbol.split(":",1)[0]
+
                 if label in label_offsets:
                     print(f"Error on line {line_number}:")
                     print('"'," ".join(line_symbols),'"')
                     print(f"2nd definition of label '{label}'")
                     raise Exception("Compilation Error")
+
                 label_offsets[label] = line_number
-                symbol_offset += 1
+
+                remaining = current_symbol.split(":",1)[1]
+                if remaining == "":
+                        symbol_offset += 1
+                        current_symbol = line_symbols[symbol_offset] 
+                else:
+                        current_symbol = remaining
             
             #check if init token @ is present
-            current_symbol = line_symbols[symbol_offset] 
             if current_symbol.startswith("@"): 
                 is_init_line = True
                 if len(current_symbol) > 1:
@@ -585,8 +555,7 @@ class Instruction_Set:
                             matched = True
                             x_dim = m.group("dim")
                             d = {"X":0,"Y":1,"Z":2}
-                    
-                            args.append(["DIR",m.group("dim"),m.group("dir")])
+                            args.append(["DIR",d[x_dim],m.group("dir")])
                             break
                     elif arg_type == "L":
                         #Labels are checked for validity at end of compile
@@ -649,8 +618,8 @@ class Instruction_Set:
         #check that labels actually exist
         for instr in instr_list:
             for arg_tup in instr.args:
-                arg_type,arg,*_ = arg_tup
-                if arg_type == "LABEL" and arg not in label_offsets: 
+                arg_type,*args = arg_tup
+                if arg_type == "LABEL" and args[0] not in label_offsets: 
                     print(f"Error in instruction '{instr}'")
                     print(f"label '{arg}' was never defined")
                     raise Exception("Compilation Error")
@@ -694,8 +663,7 @@ def main():
             if e != "Compilation Error":
                 raise e
         print()
-    main_bot = Cell_Bot("count_to_ten",(0,0),sim)
-    #def __init__(self,bot_name,coords,simulation):
+    main_bot = Cell_Bot("spawn_and_wait",(0,0),sim)
     sim.register_bot(main_bot)
     sim.run()
 

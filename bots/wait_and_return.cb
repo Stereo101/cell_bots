@@ -1,0 +1,6 @@
+@put 3 r0
+l: sub r0 1 r0
+teq r0 0
+-jmp l
+put 0 X-
+die
