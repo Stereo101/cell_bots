@@ -1,0 +1,61 @@
+#Spawn list of size 10
+spawn 1_2_list X+
+put 10 X+
+
+#wait for awhile
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+
+#Write 5 to index 3
+put 1 X+ #mode = 1 (write)
+put 3 X+ #index = 3
+put 5 X+ #value = 5
+
+#Read from index 3
+put 0 X+
+put 3 X+
+
+wait_forever: nop
+jmp wait_forever

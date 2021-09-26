@@ -21,10 +21,9 @@ class Simulation:
         self.time = 0
 
     def run(self):
-        self.print_summary()
         while True:
-            self.tick()
             self.print_summary()
+            self.tick()
             if len(self.bot_grid) == 0:
                 break
             input()
@@ -43,7 +42,8 @@ class Simulation:
             """
             print("Bot Listing")
             for bot in self.bot_grid.values():
-                print(f"\t{bot.bot_name} id:{bot.id} ip@{bot.instr_ptr} R:{bot.registers} Q:{bot.queue} coords:{bot.coords}")
+                print(f"\t{bot.bot_name} id:{bot.id} ip@{bot.instr_ptr} R:{bot.registers} Q:{bot.queue} coords:{bot.coords} arg_buf:{bot.arg_buffer}")
+                print(f"\t\t{bot.instruction_list[bot.instr_ptr]}")
             print("_________________\n\n")
 
 
@@ -64,6 +64,7 @@ class Simulation:
 
     def register_message(self,message):
         self.messages.append(message)
+        return 0
 
     def kill(self,bot_obj):
         bot_obj.dead = True
@@ -110,7 +111,7 @@ class Message:
         self.kill = kill
 
     def tick(self):
-        self.coords = tuple(coords[i] + velocity[i] for i in range(coords)) 
+        self.coords = tuple(self.coords[i] + self.velocity[i] for i in range(len(self.coords)))
 
 class Cell_Bot:
     def __init__(self,bot_name,coords,simulation):
@@ -133,7 +134,7 @@ class Cell_Bot:
         self.executed_inits = set()
 
         self.waiting_for_mesg = False
-        self.arg_buffer = [0]*4
+        self.arg_buffer = []
 
         #given by simulation when registered
         self.id = None
@@ -150,6 +151,9 @@ class Cell_Bot:
 
     def f_die(self,args=None,srcs=None):
         self.die()
+    
+    def f_nop(self,args=None,srcs=None):
+        pass
 
     def f_add(self,args=None,srcs=None):
         add_result = srcs[0] + srcs[1]
@@ -217,8 +221,7 @@ class Cell_Bot:
             #spawn a new message
             direction = self.dir_to_coords(arg_info)
             spawn_location = tuple(direction[i] + self.coords[i] for i in range(len(self.coords))) 
-            new_mesg = Message(spawn_location,direction,value,self.simulation,kill=(value == "KILL"))
-            self.simulation.register_message(new_mesg)
+            Message(spawn_location,direction,value,self.simulation,kill=(value == "KILL"))
             
         elif arg_type == "R":
             register_index = arg_info[1]
@@ -238,8 +241,13 @@ class Cell_Bot:
         #If we are in the waiting state, check
         if self.waiting_for_mesg:
             if self.remaining_args != 0:
-                #We can have enough args to execute the instr
+                #We don't have enough args to execute the instr
                 return True,[]
+            else:
+                #we were waiting, but got enough messages to execute,
+                #   set waiting to failed and then
+                #   flow to normal path
+                self.waiting_for_mesg = False
         else:
             #place items from queue into arg buffer
             q_args = sum(1 for a in args if a[0] == "Q")
@@ -268,10 +276,12 @@ class Cell_Bot:
                 ret.append(arg[1])
             else:
                 raise Exception("UNKNOWN SRC TYPE: " + source_type)
+        assert len(self.arg_buffer) == 0
         return False,ret
             
 
     def recv(self,mesg):
+        print(f"{self.bot_name} id:{self.id} recv message {mesg.value}")
         if mesg.kill:
             self.die()
         
@@ -286,6 +296,8 @@ class Cell_Bot:
         return False
 
     def execute(self,instruction):
+        print(self.bot_name,self.id,instruction)
+        
         #dont inc pointer after jmp
         skip_inc_ip = "jmp" in instruction.instr_type
 
@@ -393,6 +405,7 @@ class Instruction_Set:
         
         "fork": [   ("src_0",{"DIR"})],
         "kill": [   ("src_0",{"DIR"})],
+        "nop": [],
         "die":  []
     }
   
@@ -457,6 +470,11 @@ class Instruction_Set:
                 label_offsets[label] = line_number
 
                 remaining = current_symbol.split(":",1)[1]
+                
+                #single label line
+                if len(line_symbols) == 1:
+                    continue
+
                 if remaining == "":
                         symbol_offset += 1
                         current_symbol = line_symbols[symbol_offset] 
@@ -663,7 +681,7 @@ def main():
             if e != "Compilation Error":
                 raise e
         print()
-    main_bot = Cell_Bot("spawn_and_wait",(0,0),sim)
+    main_bot = Cell_Bot("main_list_test",(0,0),sim)
     sim.register_bot(main_bot)
     sim.run()
 

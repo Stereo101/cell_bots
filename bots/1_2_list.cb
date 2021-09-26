@@ -1,0 +1,37 @@
+init:
+    #Continue spawning nodes until
+    #   list size achieved
+    sub Q 1 r0
+    teq r0 0
+    -spawn 1_2_list X+
+    -put r0 X+
+
+wait:
+    teq Q 0     #read mode
+    +jmp read
+    -jmp write
+
+read:
+    put Q r0
+    teq r0 0
+    +put r1 X-
+    +jmp wait
+
+    #pass message to next node
+    put 0 X+ 
+    sub r0 1 X+
+
+    #passback value from intended node
+    put Q X-
+    jmp wait
+
+write:
+    put Q r0    #read index
+    teq r0 0    
+    +put Q r1   #save value
+    +jmp wait
+
+    put 1 X+    #write mode=write
+    sub r0 1 X+ #index
+    put Q X+    #value
+    jmp wait
