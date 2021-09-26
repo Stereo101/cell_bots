@@ -1,4 +1,5 @@
 import re
+import sys
 
 class Simulation:
     def __init__(self,dimensions,register_count):
@@ -20,13 +21,22 @@ class Simulation:
 
         self.time = 0
 
+        #Define system bots for process control and I/O
+        self.system_bots = {"EXIT_SUCCESS","EXIT_FAILURE"}
+        
+        #Keep dummy values
+        for sys_bot in self.system_bots:
+            self.bot_code[sys_bot] = Instruction_Set()
+        
+        
+
     def run(self):
         while True:
             self.print_summary()
             self.tick()
             if len(self.bot_grid) == 0:
                 break
-            input()
+            #input()
         print("Done.")
 
     def print_summary(self):
@@ -51,6 +61,14 @@ class Simulation:
         self.bot_code[bot_name] = instruction_list
 
     def register_bot(self,bot_obj):
+        #Do system things
+        if bot_obj.bot_name in self.system_bots:
+            sys_call = bot_obj.bot_name 
+            if sys_call == "EXIT_FAILURE":
+                sys.exit(1)
+            elif sys_call == "EXIT_SUCCESS":
+                sys.exit(0)
+            
         assert bot_obj.bot_name in self.bot_code
         if bot_obj.coords in self.bot_grid:
             #bot is overlapping another bot, kill it
@@ -169,9 +187,11 @@ class Cell_Bot:
 
     def f_div(self,args=None,srcs=None):
         div_result = srcs[0] // srcs[1]
-        mod_result = srcs[0] % srcs[1]
         self.handle_dst(args[2],div_result)
-        self.handle_dst(args[3],mod_result)
+
+    def f_mod(self,args=None,srcs=None):
+        mod_result = srcs[0] % srcs[1]
+        self.handle_dst(args[1],mod_result)
 
     def f_put(self,args=None,srcs=None):
         self.handle_dst(args[1],srcs[0])
@@ -208,11 +228,19 @@ class Cell_Bot:
 
     def f_spawn(self,args=None,srcs=None):
         bot_name = srcs[0]
+
         position = self.coords
         direction = self.dir_to_coords(args[1])
         position = tuple(position[i] + direction[i] for i in range(len(position)))
         print(f"Spawning {bot_name} @ {position}")
         new_bot = Cell_Bot(bot_name,position,self.simulation)
+        self.simulation.register_bot(new_bot)
+
+    def f_exec(self,args=None,srcs=None):
+        bot_name = srcs[0]
+        self.die()
+        print(f"Execing {bot_name} @ {self.coords}")
+        new_bot = Cell_Bot(bot_name,self.coords,self.simulation)
         self.simulation.register_bot(new_bot)
         
     def handle_dst(self,arg_info,value):
@@ -377,8 +405,11 @@ class Instruction_Set:
 
         "div":  [   ("src_0",{"R","I","Q"}),
                     ("src_1",{"R","I","Q"}),
-                    ("dst_0",{"R","DIR"}),
-                    ("dst_1",{"R","DIR"})],
+                    ("dst_0",{"R","DIR"})],
+
+        "mod":  [   ("src_0",{"R","I","Q"}),
+                    ("src_1",{"R","I","Q"}),
+                    ("dst_0",{"R","DIR"})],
 
         "tgt":  [   ("src_0",{"R","I","Q"}),
                     ("src_1",{"R","I","Q"})],
@@ -405,6 +436,7 @@ class Instruction_Set:
         
         "fork": [   ("src_0",{"DIR"})],
         "kill": [   ("src_0",{"DIR"})],
+        "exec": [   ("src_0",{"BOT"})],
         "nop": [],
         "die":  []
     }

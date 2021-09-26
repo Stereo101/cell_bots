@@ -3,50 +3,11 @@ spawn 1_2_list X+
 put 10 X+
 
 #wait for awhile
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
+put 10 r0
+l:  sub r0 1 r0
+    teq r0 0
+    -jmp l
+
 
 #Write 5 to index 3
 put 1 X+ #mode = 1 (write)
@@ -57,5 +18,10 @@ put 5 X+ #value = 5
 put 0 X+
 put 3 X+
 
-wait_forever: nop
-jmp wait_forever
+#Get response back
+put Q r0
+teq r0 5
+
+#Exit simulation based
++exec EXIT_SUCCESS
+-exec EXIT_FAILURE
