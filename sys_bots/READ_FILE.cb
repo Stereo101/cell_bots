@@ -1,0 +1,21 @@
+#Wait for mesg N,
+#   if file has no bytes ready, send 0 (usually means EOF).
+#   otherwise send X <= N, where X is the number of bytes to be read
+#       then send each byte one at a time
+
+init:
+        @flip   #flip so messages will be sent back towards spawner
+        #jmp recv_message
+
+recv_message:
+        put Q r0
+        __BYTES_AVAIL__ r0 r0   #read up to r0 bytes, and put number of ready bytes into r0
+        put r0 DIR              #send number of bytes to be read back to sender
+        #jmp send_bytes
+
+send_bytes:
+        teq r0 0                #send bytes one at a time until bytes_avail is done
+        -__READBYTE__ DIR
+        -sub r0 1 r0
+        -jmp send_bytes
+        #jmp recv_message

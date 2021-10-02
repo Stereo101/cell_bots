@@ -1,5 +1,6 @@
 import re
 import sys
+import logging
 
 class Simulation:
     def __init__(self,dimensions,register_count):
@@ -18,11 +19,10 @@ class Simulation:
         self.recently_deceased = set()
         self.bot_code = {}
         self.bot_type_counts = {}
-
         self.time = 0
 
         #Define system bots for process control and I/O
-        self.system_bots = {"EXIT_SUCCESS","EXIT_FAILURE"}
+        self.system_bots = set()
         
         #Keep dummy values
         for sys_bot in self.system_bots:
@@ -37,12 +37,12 @@ class Simulation:
             if len(self.bot_grid) == 0:
                 break
             #input()
-        print("Done.")
+        logging.debug("Done.")
 
     def print_summary(self):
-            print(f"Step {self.time}:")
+            logging.debug(f"Step {self.time}:")
             
-            print(f"________________\n")
+            logging.debug(f"________________\n")
             """
             print("Bot Counts")
             for bot_name,count in self.bot_type_counts.items():
@@ -50,27 +50,48 @@ class Simulation:
                     print(f"\t{bot_name}: {count} alive.")
             print()
             """
-            print("Bot Listing")
+            logging.debug("Bot Listing")
             for bot in self.bot_grid.values():
-                print(f"\t{bot.bot_name} id:{bot.id} ip@{bot.instr_ptr} R:{bot.registers} Q:{bot.queue} coords:{bot.coords} arg_buf:{bot.arg_buffer}")
-                print(f"\t\t{bot.instruction_list[bot.instr_ptr]}")
-            print("_________________\n\n")
+                logging.debug(f"\t{bot.bot_name} id:{bot.id} ip@{bot.instr_ptr} R:{bot.registers} Q:{bot.queue} coords:{bot.coords} arg_buf:{bot.arg_buffer}")
+                logging.debug(f"\t\t{bot.instruction_list[bot.instr_ptr]}")
+            logging.debug("_________________\n\n")
 
 
     def add_bot_code(self,bot_name,instruction_list):
+        assert bot_name not in self.system_bots
+        assert bot_name not in self.bot_code
         self.bot_code[bot_name] = instruction_list
 
-    def register_bot(self,bot_obj):
-        #Do system things
-        if bot_obj.bot_name in self.system_bots:
-            sys_call = bot_obj.bot_name 
-            if sys_call == "EXIT_FAILURE":
-                sys.exit(1)
-            elif sys_call == "EXIT_SUCCESS":
-                sys.exit(0)
+    def add_sys_bot_code(self,bot_name,instruction_list):
+        assert bot_name not in self.system_bots
+        self.system_bots.add(bot_name)
+        self.bot_code[bot_name] = instruction_list
+
+    def register_bot(self,bot_name,coords,heading=None):
+        if bot_name in self.system_bots:
+            sys_call = bot_name 
+            if sys_call == "STDIN":
+                #set file handle to sys.stdin,READ ONLY
+                bot_obj = Sys_Cell_Bot("READ_FILE",coords,self,heading=heading)
+                bot_obj.give_file_handle(sys.stdin.buffer)
+
+            elif sys_call == "STDOUT":
+                #set file handle to sys.stdout,WRITE ONLY
+                bot_obj = Sys_Cell_Bot("WRITE_FILE",coords,self,heading=heading)
+                bot_obj.give_file_handle(sys.stdout)
+
+            elif sys_call == "STDERR":
+                #set file handle to sys.stderr,WRITE ONLY
+                bot_obj = Sys_Cell_Bot("WRITE_FILE",coords,self,heading=heading)
+                bot_obj.give_file_handle(sys.stderr)
+            else:
+                bot_obj = Sys_Cell_Bot(bot_name,coords,self,heading=heading)
+        else:
+            assert bot_name in self.bot_code
+            bot_obj = Cell_Bot(bot_name,coords,self,heading=heading)
             
-        assert bot_obj.bot_name in self.bot_code
-        if bot_obj.coords in self.bot_grid:
+
+        if coords in self.bot_grid:
             #bot is overlapping another bot, kill it
             self.kill(self.bot_grid[bot_obj.coords])
 
@@ -132,7 +153,7 @@ class Message:
         self.coords = tuple(self.coords[i] + self.velocity[i] for i in range(len(self.coords)))
 
 class Cell_Bot:
-    def __init__(self,bot_name,coords,simulation):
+    def __init__(self,bot_name,coords,simulation,heading=None):
         assert bot_name in simulation.bot_code
         assert len(coords) == simulation.dimensions
 
@@ -150,6 +171,16 @@ class Cell_Bot:
         self.instruction_list = simulation.bot_code[self.bot_name].instructions
         self.label_index = simulation.bot_code[self.bot_name].label_index
         self.executed_inits = set()
+        
+        #Default heading of X+
+        if heading is None:
+            self.heading = [0] * simulation.dimensions
+            if len(self.heading) >= 1:
+                self.heading[0] = 1
+            self.heading = tuple(self.heading)
+        else:
+            self.heading = heading
+
 
         self.waiting_for_mesg = False
         self.arg_buffer = []
@@ -226,28 +257,50 @@ class Cell_Bot:
         else:
             self.registers[register_index] == 0
 
+    def f_flip(self,args=None,srcs=None):
+        self.heading = tuple(x * -1 for x in self.heading)
+
+    def f_face(self,args=None,srcs=None):
+        self.heading = self.dir_to_coords(args[0])
+
+    def f_move(self,args=None,srcs=None):
+        position = self.coords
+        position = tuple(position[i] + self.heading[i] for i in range(len(position)))
+        #check if we are about to crush a bot
+        if position in self.simulation.bot_grid:
+            logging.debug(f"Crushed a bot at {position}")
+            self.simulation.bot_grid[position].die()
+
+    def f_rcw(self,args=None,srcs=None):
+        pass
+
+    def f_rccw(self,args=None,srcs=None):
+        pass
+
     def f_spawn(self,args=None,srcs=None):
         bot_name = srcs[0]
-
         position = self.coords
-        direction = self.dir_to_coords(args[1])
+        if args[1][1] == "DIR":
+            direction = self.heading
+        else:
+            direction = self.dir_to_coords(args[1])
         position = tuple(position[i] + direction[i] for i in range(len(position)))
-        print(f"Spawning {bot_name} @ {position}")
-        new_bot = Cell_Bot(bot_name,position,self.simulation)
-        self.simulation.register_bot(new_bot)
+        self.simulation.register_bot(bot_name,position,heading=direction)
 
     def f_exec(self,args=None,srcs=None):
         bot_name = srcs[0]
         self.die()
-        print(f"Execing {bot_name} @ {self.coords}")
-        new_bot = Cell_Bot(bot_name,self.coords,self.simulation)
-        self.simulation.register_bot(new_bot)
+        logging.debug(f"Execing {bot_name} @ {self.coords}")
+        self.simulation.register_bot(bot_name,self.coords)
         
     def handle_dst(self,arg_info,value):
         arg_type = arg_info[0]
         if arg_type == "DIR":
+            if arg_info[1] == "DIR":
+                direction = self.heading
+            else:
+                direction = self.dir_to_coords(arg_info)
             #spawn a new message
-            direction = self.dir_to_coords(arg_info)
             spawn_location = tuple(direction[i] + self.coords[i] for i in range(len(self.coords))) 
             Message(spawn_location,direction,value,self.simulation,kill=(value == "KILL"))
             
@@ -287,7 +340,6 @@ class Cell_Bot:
                 self.remaining_args = q_args
                 self.waiting_for_mesg = True
                 return True,[]
-                
             
         ret = []
         for arg in args:
@@ -302,6 +354,8 @@ class Cell_Bot:
                 ret.append(arg[1])
             elif source_type == "LABEL":
                 ret.append(arg[1])
+            elif source_type == "DIR":
+                ret.append(self.heading)
             else:
                 raise Exception("UNKNOWN SRC TYPE: " + source_type)
         assert len(self.arg_buffer) == 0
@@ -309,7 +363,7 @@ class Cell_Bot:
             
 
     def recv(self,mesg):
-        print(f"{self.bot_name} id:{self.id} recv message {mesg.value}")
+        logging.debug(f"{self.bot_name} id:{self.id} recv message {mesg.value}")
         if mesg.kill:
             self.die()
         
@@ -324,7 +378,7 @@ class Cell_Bot:
         return False
 
     def execute(self,instruction):
-        print(self.bot_name,self.id,instruction)
+        logging.debug(self.bot_name,self.id,instruction)
         
         #dont inc pointer after jmp
         skip_inc_ip = "jmp" in instruction.instr_type
@@ -365,6 +419,58 @@ class Cell_Bot:
         if self.instr_ptr >= len(self.instruction_list):
             self.instr_ptr = 0
 
+class Sys_Cell_Bot(Cell_Bot):
+    def __init__(self,bot_name,coords,simulation,heading=None):
+        self.file_handle = None
+        self.is_file = False
+        self.byte_buffer = b""
+        self.byte_buffer_index = 0
+        self.byte_buffer_remaining = 0
+        
+        super().__init__(bot_name,coords,simulation)
+
+    def give_file_handle(self,file_handle):
+        self.file_handle = file_handle
+        self.is_file = file_handle is not None
+        
+    def f___BYTESAVAIL__(self,args=None,srcs=None):
+        bytes_to_read = srcs[0]
+        if bytes_to_read <= byte_buffer_remaining:
+            bytes_avail = bytes_to_read
+        elif byte_buffer_remaining != 0:
+            #try to read the difference
+            difference = bytes_to_read - byte_buffer_remaining
+            new_bytes = self.file_handle.read(difference)
+            self.byte_buffer += new_bytes
+            byte_buffer_remaining += len(new_bytes)
+            bytes_avail = byte_buffer_remaining
+        else:
+            #just read the end
+            self.byte_buffer = self.file_handle.read(bytes_to_read)
+            self.byte_buffer_remaining = len(self.byte_buffer)
+            self.byte_buffer_index = 0
+            bytes_avail = self.byte_buffer_remaining
+            
+        self.handle_dst(args[1],value=byte_avail)
+        
+
+    def f___WRITEBYTE__(self,args=None,srcs=None):
+        self.file_handle.write(chr(srcs[0] & 0xFF))
+
+    def f___READBYTE__(self,args=None,srcs=None):
+        if self.byte_buffer_remaining > 0:
+            self.handle_dst(args[0],value=int(self.byte_buffer[byte_buffer_index]))
+            self.byte_buffer_index += 1
+            self.byte_buffer_remaining -= 1
+            return
+            
+        #This shouldn't happen in a well behaved sys_bot
+        raise Exception("__READBYTE__ was not prepped by __BYTESAVAIL__")
+        b = self.file_handle.read(1)
+        self.handle_dst(args[0],value=int(b))
+
+    def f___EXIT__(self,args=None,srcs=None):
+        sys.exit(srcs[0])
         
 #struct to hold information about a single instruction
 
@@ -428,6 +534,15 @@ class Instruction_Set:
         "not":  [   ("dst_0",{"R"})],
         "id":   [   ("dst_0",{"R","DIR"})],
 
+        "rcw":  [   ("src_0",{"R","I","Q"}),
+                    ("src_1",{"R","I","Q"})],
+
+        "rccw": [   ("src_0",{"R","I","Q"}),
+                    ("src_1",{"R","I","Q"})],
+        "flip": [],
+        "move": [],
+        "face": [   ("src_0",{"DIR"})],
+
         "count":[   ("src_0",{"BOT"}),
                     ("dst_0",{"R","DIR"})],
 
@@ -435,10 +550,19 @@ class Instruction_Set:
                     ("dst_0",{"DIR"})],
         
         "fork": [   ("src_0",{"DIR"})],
-        "kill": [   ("src_0",{"DIR"})],
         "exec": [   ("src_0",{"BOT"})],
-        "nop": [],
-        "die":  []
+
+        "kill": [   ("src_0",{"DIR"})],
+        "nop":  [],
+        "die":  [],
+
+        "__BYTES_AVAIL__": [("src_0",{"R","I","Q"}),
+                            ("dst_0",{"R","DIR"})],
+
+        "__READBYTE__": [("dst_0",{"R","DIR"})],
+        "__WRITEBYTE__":[("src_0",{"R","I","Q"})],
+        "__EXIT__": [("src_0",{"R","I","Q"})]
+
     }
   
     def __init__(self):
@@ -535,8 +659,6 @@ class Instruction_Set:
                     #go to the next symbol
                     symbol_offset += 1
                     current_symbol = line_symbols[symbol_offset]
-                
-
 
             #Ensure instruction type is valid
             instr_type = current_symbol
@@ -593,6 +715,11 @@ class Instruction_Set:
                             break
 
                     elif arg_type == "DIR":
+                        #Use bots internal DIR register
+                        if current_symbol == "DIR":
+                            matched = True
+                            args.append(["DIR","DIR"])
+                            break
                         m = re.match(d_style_dir_regex,current_symbol)
                         if m:
                             matched = True
@@ -644,7 +771,7 @@ class Instruction_Set:
                     raise Exception("Compilation Error")
             act = Action(instr_type,args,cond_type=cond_line_type,is_init=is_init_line)
             instr_list.append([line_number,act]) 
-            print(act)
+            logging.debug(act)
     
 
         #mangle label index from raw line numbers to compiled line number
@@ -663,7 +790,7 @@ class Instruction_Set:
 
         #get rid of raw line numbers now that labels are adjusted
         instr_list = [x for _,x in instr_list]
-        print(label_offsets)
+        logging.debug(label_offsets)
 
         #check that labels actually exist
         for instr in instr_list:
@@ -683,7 +810,7 @@ def test_bad_bots():
     bot_code_dir = "bad_bots"
     for bot in os.listdir(bot_code_dir):
         try:
-            print("compiling",bot)
+            logging.debug(f"compiling {bot}")
             bot_fp = os.path.join(bot_code_dir,bot)
             instr = Instruction_Set()
             instr.load(bot_fp)
@@ -691,7 +818,7 @@ def test_bad_bots():
             print("error while compiling",bot,":",e)
             if "Compilation Error" not in str(e):
                 raise e
-        print()
+        logging.debug()
 
 
 
@@ -699,22 +826,40 @@ def main():
     import os
     sim = Simulation(register_count=2,dimensions=2)
     bot_code_dir = "bots"
+    sys_bot_code_dir = "sys_bots"
     for bot in os.listdir(bot_code_dir):
+        if not bot.endswith(".cb"):
+            continue
         bot_name = bot.split(".")[0]
         try:
-            print("compiling",bot)
+            logging.debug("compiling",bot)
             bot_fp = os.path.join(bot_code_dir,bot)
             instr = Instruction_Set()
             instr.load(bot_fp)
-            print(f"compiled {bot} successfully.")
+            logging.debug(f"compiled {bot} successfully.")
             sim.add_bot_code(bot_name,instr)
         except Exception as e:
             print("error while compiling",bot,":",e)
             if e != "Compilation Error":
                 raise e
-        print()
-    main_bot = Cell_Bot("main_list_test",(0,0),sim)
-    sim.register_bot(main_bot)
+
+    for bot in os.listdir(sys_bot_code_dir):
+        if not bot.endswith(".cb"):
+            continue
+        bot_name = bot.split(".")[0]
+        try:
+            logging.debug(f"compiling sys_bot {bot}")
+            bot_fp = os.path.join(sys_bot_code_dir,bot)
+            instr = Instruction_Set()
+            instr.load(bot_fp)
+            logging.debug(f"compiled sys_bot {bot} successfully.")
+            sim.add_sys_bot_code(bot_name,instr)
+        except Exception as e:
+            print("error while compiling sys_bot",bot,":",e)
+            if e != "Compilation Error":
+                raise e
+
+    sim.register_bot("hello_world",(0,0))
     sim.run()
 
 if __name__ == "__main__":

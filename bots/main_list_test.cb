@@ -3,10 +3,10 @@ spawn 1_2_list X+
 put 10 X+
 
 #wait for awhile
-put 10 r0
-l:  sub r0 1 r0
-    teq r0 0
-    -jmp l
+#put 10 r0
+#l:  sub r0 1 r0
+#    teq r0 0
+#    -jmp l
 
 
 #Write 5 to index 3
@@ -22,6 +22,7 @@ put 3 X+
 put Q r0
 teq r0 5
 
-#Exit simulation based
+#Exit simulation
 +exec EXIT_SUCCESS
 -exec EXIT_FAILURE
+die

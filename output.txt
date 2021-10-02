@@ -1,0 +1,2644 @@
+compiling main_list_test.cb
+spawn [['BOT', '1_2_list'], ['DIR', 0, '+']]
+put [['I', 1000], ['DIR', 0, '+']]
+put [['I', 10], ['R', 0]]
+sub [['R', 0], ['I', 1], ['R', 0]]
+teq [['R', 0], ['I', 0]]
+-jmp [['LABEL', 'l']]
+put [['I', 1], ['DIR', 0, '+']]
+put [['I', 3], ['DIR', 0, '+']]
+put [['I', 5], ['DIR', 0, '+']]
+put [['I', 0], ['DIR', 0, '+']]
+put [['I', 3], ['DIR', 0, '+']]
+put [['Q'], ['R', 0]]
+teq [['R', 0], ['I', 5]]
++exec [['BOT', 'EXIT_SUCCESS']]
+-exec [['BOT', 'EXIT_FAILURE']]
+die []
+{'l': 3}
+compiled main_list_test.cb successfully.
+
+compiling count_to_ten.cb
+@put [['I', 1], ['R', 1]]
+put [['R', 1], ['DIR', 0, '+']]
+add [['I', 1], ['R', 1], ['R', 1]]
+tgt [['R', 1], ['I', 10]]
++die []
+{}
+compiled count_to_ten.cb successfully.
+
+compiling label_count.cb
+@put [['I', 1], ['R', 0]]
+put [['R', 0], ['DIR', 0, '+']]
+tgt [['R', 0], ['I', 10]]
++jmp [['LABEL', 'end']]
+-jmp [['LABEL', 'l']]
+die []
+{'l': 1, 'end': 5}
+compiled label_count.cb successfully.
+
+compiling wait_and_return.cb
+@put [['I', 3], ['R', 0]]
+sub [['R', 0], ['I', 1], ['R', 0]]
+teq [['R', 0], ['I', 0]]
+-jmp [['LABEL', 'l']]
+put [['I', 0], ['DIR', 0, '-']]
+die []
+{'l': 1}
+compiled wait_and_return.cb successfully.
+
+compiling spawn_and_wait.cb
+spawn [['BOT', 'wait_and_return'], ['DIR', 0, '+']]
+put [['Q'], ['R', 0]]
+die []
+{}
+compiled spawn_and_wait.cb successfully.
+
+compiling 1_2_list.cb
+sub [['Q'], ['I', 1], ['R', 0]]
+teq [['R', 0], ['I', 0]]
+-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+-put [['R', 0], ['DIR', 'DIR']]
+teq [['Q'], ['I', 0]]
++jmp [['LABEL', 'read']]
+-jmp [['LABEL', 'write']]
+put [['Q'], ['R', 0]]
+teq [['R', 0], ['I', 0]]
++flip []
++put [['R', 1], ['DIR', 'DIR']]
++flip []
++jmp [['LABEL', 'wait']]
+put [['I', 0], ['DIR', 'DIR']]
+sub [['R', 0], ['I', 1], ['DIR', 'DIR']]
+flip []
+put [['Q'], ['DIR', 'DIR']]
+flip []
+jmp [['LABEL', 'wait']]
+put [['Q'], ['R', 0]]
+teq [['R', 0], ['I', 0]]
++put [['Q'], ['R', 1]]
++jmp [['LABEL', 'wait']]
+put [['I', 1], ['DIR', 'DIR']]
+sub [['R', 0], ['I', 1], ['DIR', 'DIR']]
+put [['Q'], ['DIR', 'DIR']]
+jmp [['LABEL', 'wait']]
+{'init': 0, 'wait': 4, 'read': 7, 'write': 19}
+compiled 1_2_list.cb successfully.
+
+Step 0:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@0 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		spawn [['BOT', '1_2_list'], ['DIR', 0, '+']]
+_________________
+
+
+main_list_test 0 spawn [['BOT', '1_2_list'], ['DIR', 0, '+']]
+[['BOT', '1_2_list'], ['DIR', 0, '+']]
+['DIR', 0, '+'] <class 'list'>
+Spawning 1_2_list @ (1, 0)
+Step 1:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@1 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['I', 1000], ['DIR', 0, '+']]
+	1_2_list id:1 ip@0 R:[0, 0] Q:[] coords:(1, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+main_list_test 0 put [['I', 1000], ['DIR', 0, '+']]
+1_2_list 1 sub [['Q'], ['I', 1], ['R', 0]]
+Step 2:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@2 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['I', 10], ['R', 0]]
+	1_2_list id:1 ip@0 R:[0, 0] Q:[] coords:(1, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:1 recv message 1000
+main_list_test 0 put [['I', 10], ['R', 0]]
+1_2_list 1 sub [['Q'], ['I', 1], ['R', 0]]
+Step 3:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@3 R:[10, 0] Q:[] coords:(0, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['R', 0]]
+	1_2_list id:1 ip@1 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+main_list_test 0 sub [['R', 0], ['I', 1], ['R', 0]]
+1_2_list 1 teq [['R', 0], ['I', 0]]
+Step 4:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@4 R:[9, 0] Q:[] coords:(0, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:1 ip@2 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+main_list_test 0 teq [['R', 0], ['I', 0]]
+1_2_list 1 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (2, 0)
+Step 5:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@5 R:[9, 0] Q:[] coords:(0, 0) arg_buf:[]
+		-jmp [['LABEL', 'l']]
+	1_2_list id:1 ip@3 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:2 ip@0 R:[0, 0] Q:[] coords:(2, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+main_list_test 0 -jmp [['LABEL', 'l']]
+1_2_list 1 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 2 sub [['Q'], ['I', 1], ['R', 0]]
+Step 6:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@3 R:[9, 0] Q:[] coords:(0, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['R', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@0 R:[0, 0] Q:[] coords:(2, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:2 recv message 999
+main_list_test 0 sub [['R', 0], ['I', 1], ['R', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 sub [['Q'], ['I', 1], ['R', 0]]
+Step 7:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@4 R:[8, 0] Q:[] coords:(0, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@1 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+main_list_test 0 teq [['R', 0], ['I', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['R', 0], ['I', 0]]
+Step 8:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@5 R:[8, 0] Q:[] coords:(0, 0) arg_buf:[]
+		-jmp [['LABEL', 'l']]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@2 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+main_list_test 0 -jmp [['LABEL', 'l']]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (3, 0)
+Step 9:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@3 R:[8, 0] Q:[] coords:(0, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['R', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@3 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:3 ip@0 R:[0, 0] Q:[] coords:(3, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+main_list_test 0 sub [['R', 0], ['I', 1], ['R', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 3 sub [['Q'], ['I', 1], ['R', 0]]
+Step 10:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@4 R:[7, 0] Q:[] coords:(0, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@0 R:[0, 0] Q:[] coords:(3, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:3 recv message 998
+main_list_test 0 teq [['R', 0], ['I', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 sub [['Q'], ['I', 1], ['R', 0]]
+Step 11:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@5 R:[7, 0] Q:[] coords:(0, 0) arg_buf:[]
+		-jmp [['LABEL', 'l']]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@1 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+main_list_test 0 -jmp [['LABEL', 'l']]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['R', 0], ['I', 0]]
+Step 12:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@3 R:[7, 0] Q:[] coords:(0, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['R', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@2 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+main_list_test 0 sub [['R', 0], ['I', 1], ['R', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (4, 0)
+Step 13:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@4 R:[6, 0] Q:[] coords:(0, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@3 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:4 ip@0 R:[0, 0] Q:[] coords:(4, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+main_list_test 0 teq [['R', 0], ['I', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 4 sub [['Q'], ['I', 1], ['R', 0]]
+Step 14:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@5 R:[6, 0] Q:[] coords:(0, 0) arg_buf:[]
+		-jmp [['LABEL', 'l']]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@0 R:[0, 0] Q:[] coords:(4, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:4 recv message 997
+main_list_test 0 -jmp [['LABEL', 'l']]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 sub [['Q'], ['I', 1], ['R', 0]]
+Step 15:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@3 R:[6, 0] Q:[] coords:(0, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['R', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@1 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+main_list_test 0 sub [['R', 0], ['I', 1], ['R', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['R', 0], ['I', 0]]
+Step 16:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@4 R:[5, 0] Q:[] coords:(0, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@2 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+main_list_test 0 teq [['R', 0], ['I', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (5, 0)
+Step 17:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@5 R:[5, 0] Q:[] coords:(0, 0) arg_buf:[]
+		-jmp [['LABEL', 'l']]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@3 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:5 ip@0 R:[0, 0] Q:[] coords:(5, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+main_list_test 0 -jmp [['LABEL', 'l']]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 5 sub [['Q'], ['I', 1], ['R', 0]]
+Step 18:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@3 R:[5, 0] Q:[] coords:(0, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['R', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@0 R:[0, 0] Q:[] coords:(5, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:5 recv message 996
+main_list_test 0 sub [['R', 0], ['I', 1], ['R', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 sub [['Q'], ['I', 1], ['R', 0]]
+Step 19:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@4 R:[4, 0] Q:[] coords:(0, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@1 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+main_list_test 0 teq [['R', 0], ['I', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['R', 0], ['I', 0]]
+Step 20:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@5 R:[4, 0] Q:[] coords:(0, 0) arg_buf:[]
+		-jmp [['LABEL', 'l']]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@2 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+main_list_test 0 -jmp [['LABEL', 'l']]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (6, 0)
+Step 21:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@3 R:[4, 0] Q:[] coords:(0, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['R', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@3 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:6 ip@0 R:[0, 0] Q:[] coords:(6, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+main_list_test 0 sub [['R', 0], ['I', 1], ['R', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 6 sub [['Q'], ['I', 1], ['R', 0]]
+Step 22:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@4 R:[3, 0] Q:[] coords:(0, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@0 R:[0, 0] Q:[] coords:(6, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:6 recv message 995
+main_list_test 0 teq [['R', 0], ['I', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 sub [['Q'], ['I', 1], ['R', 0]]
+Step 23:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@5 R:[3, 0] Q:[] coords:(0, 0) arg_buf:[]
+		-jmp [['LABEL', 'l']]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@1 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+main_list_test 0 -jmp [['LABEL', 'l']]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['R', 0], ['I', 0]]
+Step 24:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@3 R:[3, 0] Q:[] coords:(0, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['R', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@2 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+main_list_test 0 sub [['R', 0], ['I', 1], ['R', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (7, 0)
+Step 25:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@4 R:[2, 0] Q:[] coords:(0, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@3 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:7 ip@0 R:[0, 0] Q:[] coords:(7, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+main_list_test 0 teq [['R', 0], ['I', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 7 sub [['Q'], ['I', 1], ['R', 0]]
+Step 26:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@5 R:[2, 0] Q:[] coords:(0, 0) arg_buf:[]
+		-jmp [['LABEL', 'l']]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@0 R:[0, 0] Q:[] coords:(7, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:7 recv message 994
+main_list_test 0 -jmp [['LABEL', 'l']]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 sub [['Q'], ['I', 1], ['R', 0]]
+Step 27:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@3 R:[2, 0] Q:[] coords:(0, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['R', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@1 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+main_list_test 0 sub [['R', 0], ['I', 1], ['R', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['R', 0], ['I', 0]]
+Step 28:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@4 R:[1, 0] Q:[] coords:(0, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@2 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+main_list_test 0 teq [['R', 0], ['I', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (8, 0)
+Step 29:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@5 R:[1, 0] Q:[] coords:(0, 0) arg_buf:[]
+		-jmp [['LABEL', 'l']]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@3 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:8 ip@0 R:[0, 0] Q:[] coords:(8, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+main_list_test 0 -jmp [['LABEL', 'l']]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 8 sub [['Q'], ['I', 1], ['R', 0]]
+Step 30:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@3 R:[1, 0] Q:[] coords:(0, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['R', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@0 R:[0, 0] Q:[] coords:(8, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:8 recv message 993
+main_list_test 0 sub [['R', 0], ['I', 1], ['R', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 sub [['Q'], ['I', 1], ['R', 0]]
+Step 31:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@4 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@1 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+main_list_test 0 teq [['R', 0], ['I', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['R', 0], ['I', 0]]
+Step 32:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@6 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['I', 1], ['DIR', 0, '+']]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@2 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+main_list_test 0 put [['I', 1], ['DIR', 0, '+']]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (9, 0)
+Step 33:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@7 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['I', 3], ['DIR', 0, '+']]
+	1_2_list id:1 ip@4 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@3 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:9 ip@0 R:[0, 0] Q:[] coords:(9, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:1 recv message 1
+main_list_test 0 put [['I', 3], ['DIR', 0, '+']]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 9 sub [['Q'], ['I', 1], ['R', 0]]
+Step 34:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@8 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['I', 5], ['DIR', 0, '+']]
+	1_2_list id:1 ip@6 R:[999, 0] Q:[] coords:(1, 0) arg_buf:[]
+		-jmp [['LABEL', 'write']]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@0 R:[0, 0] Q:[] coords:(9, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:1 recv message 3
+1_2_list id:9 recv message 992
+main_list_test 0 put [['I', 5], ['DIR', 0, '+']]
+1_2_list 1 -jmp [['LABEL', 'write']]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 sub [['Q'], ['I', 1], ['R', 0]]
+Step 35:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@9 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['I', 0], ['DIR', 0, '+']]
+	1_2_list id:1 ip@19 R:[999, 0] Q:[3] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@1 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+1_2_list id:1 recv message 5
+main_list_test 0 put [['I', 0], ['DIR', 0, '+']]
+1_2_list 1 put [['Q'], ['R', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['R', 0], ['I', 0]]
+Step 36:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@10 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['I', 3], ['DIR', 0, '+']]
+	1_2_list id:1 ip@20 R:[3, 0] Q:[5] coords:(1, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@2 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+1_2_list id:1 recv message 0
+main_list_test 0 put [['I', 3], ['DIR', 0, '+']]
+1_2_list 1 teq [['R', 0], ['I', 0]]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (10, 0)
+Step 37:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@23 R:[3, 0] Q:[0, 5] coords:(1, 0) arg_buf:[]
+		put [['I', 1], ['DIR', 'DIR']]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@3 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:10 ip@0 R:[0, 0] Q:[] coords:(10, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:1 recv message 3
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['I', 1], ['DIR', 'DIR']]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 10 sub [['Q'], ['I', 1], ['R', 0]]
+Step 38:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@24 R:[3, 0] Q:[3, 0, 5] coords:(1, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['DIR', 'DIR']]
+	1_2_list id:2 ip@4 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@0 R:[0, 0] Q:[] coords:(10, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:2 recv message 1
+1_2_list id:10 recv message 991
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 sub [['R', 0], ['I', 1], ['DIR', 'DIR']]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 sub [['Q'], ['I', 1], ['R', 0]]
+Step 39:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@25 R:[3, 0] Q:[3, 0, 5] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@6 R:[998, 0] Q:[] coords:(2, 0) arg_buf:[]
+		-jmp [['LABEL', 'write']]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@1 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+1_2_list id:2 recv message 2
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 -jmp [['LABEL', 'write']]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['R', 0], ['I', 0]]
+Step 40:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@26 R:[3, 0] Q:[3, 0] coords:(1, 0) arg_buf:[]
+		jmp [['LABEL', 'wait']]
+	1_2_list id:2 ip@19 R:[998, 0] Q:[2] coords:(2, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@2 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+1_2_list id:2 recv message 5
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 jmp [['LABEL', 'wait']]
+1_2_list 2 put [['Q'], ['R', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (11, 0)
+Step 41:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@4 R:[3, 0] Q:[3, 0] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@20 R:[2, 0] Q:[5] coords:(2, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@3 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:11 ip@0 R:[0, 0] Q:[] coords:(11, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 teq [['Q'], ['I', 0]]
+1_2_list 2 teq [['R', 0], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 11 sub [['Q'], ['I', 1], ['R', 0]]
+Step 42:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@5 R:[3, 0] Q:[3] coords:(1, 0) arg_buf:[]
+		+jmp [['LABEL', 'read']]
+	1_2_list id:2 ip@23 R:[2, 0] Q:[5] coords:(2, 0) arg_buf:[]
+		put [['I', 1], ['DIR', 'DIR']]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@0 R:[0, 0] Q:[] coords:(11, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:11 recv message 990
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 +jmp [['LABEL', 'read']]
+1_2_list 2 put [['I', 1], ['DIR', 'DIR']]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 sub [['Q'], ['I', 1], ['R', 0]]
+Step 43:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@7 R:[3, 0] Q:[3] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:2 ip@24 R:[2, 0] Q:[5] coords:(2, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['DIR', 'DIR']]
+	1_2_list id:3 ip@4 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@1 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+1_2_list id:3 recv message 1
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['R', 0]]
+1_2_list 2 sub [['R', 0], ['I', 1], ['DIR', 'DIR']]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['R', 0], ['I', 0]]
+Step 44:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@8 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:2 ip@25 R:[2, 0] Q:[5] coords:(2, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:3 ip@6 R:[997, 0] Q:[] coords:(3, 0) arg_buf:[]
+		-jmp [['LABEL', 'write']]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@2 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+1_2_list id:3 recv message 1
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 teq [['R', 0], ['I', 0]]
+1_2_list 2 put [['Q'], ['DIR', 'DIR']]
+1_2_list 3 -jmp [['LABEL', 'write']]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (12, 0)
+Step 45:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@13 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['I', 0], ['DIR', 'DIR']]
+	1_2_list id:2 ip@26 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		jmp [['LABEL', 'wait']]
+	1_2_list id:3 ip@19 R:[997, 0] Q:[1] coords:(3, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@3 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:12 ip@0 R:[0, 0] Q:[] coords:(12, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:3 recv message 5
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['I', 0], ['DIR', 'DIR']]
+1_2_list 2 jmp [['LABEL', 'wait']]
+1_2_list 3 put [['Q'], ['R', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 12 sub [['Q'], ['I', 1], ['R', 0]]
+Step 46:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@14 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['DIR', 'DIR']]
+	1_2_list id:2 ip@4 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@20 R:[1, 0] Q:[5] coords:(3, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@0 R:[0, 0] Q:[] coords:(12, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:2 recv message 0
+1_2_list id:12 recv message 989
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 sub [['R', 0], ['I', 1], ['DIR', 'DIR']]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['R', 0], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 sub [['Q'], ['I', 1], ['R', 0]]
+Step 47:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@15 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		flip []
+	1_2_list id:2 ip@5 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		+jmp [['LABEL', 'read']]
+	1_2_list id:3 ip@23 R:[1, 0] Q:[5] coords:(3, 0) arg_buf:[]
+		put [['I', 1], ['DIR', 'DIR']]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@1 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+1_2_list id:2 recv message 2
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 flip []
+1_2_list 2 +jmp [['LABEL', 'read']]
+1_2_list 3 put [['I', 1], ['DIR', 'DIR']]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['R', 0], ['I', 0]]
+Step 48:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@7 R:[2, 0] Q:[2] coords:(2, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:3 ip@24 R:[1, 0] Q:[5] coords:(3, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['DIR', 'DIR']]
+	1_2_list id:4 ip@4 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@2 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+1_2_list id:4 recv message 1
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 put [['Q'], ['R', 0]]
+1_2_list 3 sub [['R', 0], ['I', 1], ['DIR', 'DIR']]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (13, 0)
+Step 49:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@8 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:3 ip@25 R:[1, 0] Q:[5] coords:(3, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:4 ip@6 R:[996, 0] Q:[] coords:(4, 0) arg_buf:[]
+		-jmp [['LABEL', 'write']]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@3 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:13 ip@0 R:[0, 0] Q:[] coords:(13, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:4 recv message 0
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 teq [['R', 0], ['I', 0]]
+1_2_list 3 put [['Q'], ['DIR', 'DIR']]
+1_2_list 4 -jmp [['LABEL', 'write']]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 13 sub [['Q'], ['I', 1], ['R', 0]]
+Step 50:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@13 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		put [['I', 0], ['DIR', 'DIR']]
+	1_2_list id:3 ip@26 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		jmp [['LABEL', 'wait']]
+	1_2_list id:4 ip@19 R:[996, 0] Q:[0] coords:(4, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@0 R:[0, 0] Q:[] coords:(13, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:4 recv message 5
+1_2_list id:13 recv message 988
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 put [['I', 0], ['DIR', 'DIR']]
+1_2_list 3 jmp [['LABEL', 'wait']]
+1_2_list 4 put [['Q'], ['R', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 sub [['Q'], ['I', 1], ['R', 0]]
+Step 51:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@14 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['DIR', 'DIR']]
+	1_2_list id:3 ip@4 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@20 R:[0, 0] Q:[5] coords:(4, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@1 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+1_2_list id:3 recv message 0
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 sub [['R', 0], ['I', 1], ['DIR', 'DIR']]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['R', 0], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 teq [['R', 0], ['I', 0]]
+Step 52:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@15 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		flip []
+	1_2_list id:3 ip@5 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		+jmp [['LABEL', 'read']]
+	1_2_list id:4 ip@21 R:[0, 0] Q:[5] coords:(4, 0) arg_buf:[]
+		+put [['Q'], ['R', 1]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@2 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+1_2_list id:3 recv message 1
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 flip []
+1_2_list 3 +jmp [['LABEL', 'read']]
+1_2_list 4 +put [['Q'], ['R', 1]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (14, 0)
+Step 53:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@16 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:3 ip@7 R:[1, 0] Q:[1] coords:(3, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:4 ip@22 R:[0, 5] Q:[] coords:(4, 0) arg_buf:[]
+		+jmp [['LABEL', 'wait']]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@3 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:14 ip@0 R:[0, 0] Q:[] coords:(14, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 put [['Q'], ['DIR', 'DIR']]
+1_2_list 3 put [['Q'], ['R', 0]]
+1_2_list 4 +jmp [['LABEL', 'wait']]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 14 sub [['Q'], ['I', 1], ['R', 0]]
+Step 54:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@16 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:3 ip@8 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:4 ip@4 R:[0, 5] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@4 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:14 ip@0 R:[0, 0] Q:[] coords:(14, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:14 recv message 987
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 put [['Q'], ['DIR', 'DIR']]
+1_2_list 3 teq [['R', 0], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 teq [['Q'], ['I', 0]]
+1_2_list 14 sub [['Q'], ['I', 1], ['R', 0]]
+Step 55:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@16 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:3 ip@13 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		put [['I', 0], ['DIR', 'DIR']]
+	1_2_list id:4 ip@4 R:[0, 5] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@4 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:14 ip@1 R:[986, 0] Q:[] coords:(14, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 put [['Q'], ['DIR', 'DIR']]
+1_2_list 3 put [['I', 0], ['DIR', 'DIR']]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 teq [['Q'], ['I', 0]]
+1_2_list 14 teq [['R', 0], ['I', 0]]
+Step 56:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@16 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:3 ip@14 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		sub [['R', 0], ['I', 1], ['DIR', 'DIR']]
+	1_2_list id:4 ip@4 R:[0, 5] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@4 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:14 ip@2 R:[986, 0] Q:[] coords:(14, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+1_2_list id:4 recv message 0
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 put [['Q'], ['DIR', 'DIR']]
+1_2_list 3 sub [['R', 0], ['I', 1], ['DIR', 'DIR']]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 teq [['Q'], ['I', 0]]
+1_2_list 14 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (15, 0)
+Step 57:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@16 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:3 ip@15 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		flip []
+	1_2_list id:4 ip@5 R:[0, 5] Q:[] coords:(4, 0) arg_buf:[]
+		+jmp [['LABEL', 'read']]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@4 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:14 ip@3 R:[986, 0] Q:[] coords:(14, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:15 ip@0 R:[0, 0] Q:[] coords:(15, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:4 recv message 0
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 put [['Q'], ['DIR', 'DIR']]
+1_2_list 3 flip []
+1_2_list 4 +jmp [['LABEL', 'read']]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 teq [['Q'], ['I', 0]]
+1_2_list 14 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 15 sub [['Q'], ['I', 1], ['R', 0]]
+Step 58:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@16 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:3 ip@16 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:4 ip@7 R:[0, 5] Q:[0] coords:(4, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@4 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:14 ip@4 R:[986, 0] Q:[] coords:(14, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:15 ip@0 R:[0, 0] Q:[] coords:(15, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:15 recv message 986
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 put [['Q'], ['DIR', 'DIR']]
+1_2_list 3 put [['Q'], ['DIR', 'DIR']]
+1_2_list 4 put [['Q'], ['R', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 teq [['Q'], ['I', 0]]
+1_2_list 14 teq [['Q'], ['I', 0]]
+1_2_list 15 sub [['Q'], ['I', 1], ['R', 0]]
+Step 59:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@16 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:3 ip@16 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:4 ip@8 R:[0, 5] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@4 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:14 ip@4 R:[986, 0] Q:[] coords:(14, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:15 ip@1 R:[985, 0] Q:[] coords:(15, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 put [['Q'], ['DIR', 'DIR']]
+1_2_list 3 put [['Q'], ['DIR', 'DIR']]
+1_2_list 4 teq [['R', 0], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 teq [['Q'], ['I', 0]]
+1_2_list 14 teq [['Q'], ['I', 0]]
+1_2_list 15 teq [['R', 0], ['I', 0]]
+Step 60:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@16 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:3 ip@16 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:4 ip@9 R:[0, 5] Q:[] coords:(4, 0) arg_buf:[]
+		+flip []
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@4 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:14 ip@4 R:[986, 0] Q:[] coords:(14, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:15 ip@2 R:[985, 0] Q:[] coords:(15, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 put [['Q'], ['DIR', 'DIR']]
+1_2_list 3 put [['Q'], ['DIR', 'DIR']]
+1_2_list 4 +flip []
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 teq [['Q'], ['I', 0]]
+1_2_list 14 teq [['Q'], ['I', 0]]
+1_2_list 15 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (16, 0)
+Step 61:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@16 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:3 ip@16 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:4 ip@10 R:[0, 5] Q:[] coords:(4, 0) arg_buf:[]
+		+put [['R', 1], ['DIR', 'DIR']]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@4 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:14 ip@4 R:[986, 0] Q:[] coords:(14, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:15 ip@3 R:[985, 0] Q:[] coords:(15, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:16 ip@0 R:[0, 0] Q:[] coords:(16, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 put [['Q'], ['DIR', 'DIR']]
+1_2_list 3 put [['Q'], ['DIR', 'DIR']]
+1_2_list 4 +put [['R', 1], ['DIR', 'DIR']]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 teq [['Q'], ['I', 0]]
+1_2_list 14 teq [['Q'], ['I', 0]]
+1_2_list 15 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 16 sub [['Q'], ['I', 1], ['R', 0]]
+Step 62:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@16 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:3 ip@16 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:4 ip@11 R:[0, 5] Q:[] coords:(4, 0) arg_buf:[]
+		+flip []
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@4 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:14 ip@4 R:[986, 0] Q:[] coords:(14, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:15 ip@4 R:[985, 0] Q:[] coords:(15, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:16 ip@0 R:[0, 0] Q:[] coords:(16, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:3 recv message 5
+1_2_list id:16 recv message 985
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 put [['Q'], ['DIR', 'DIR']]
+1_2_list 3 put [['Q'], ['DIR', 'DIR']]
+1_2_list 4 +flip []
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 teq [['Q'], ['I', 0]]
+1_2_list 14 teq [['Q'], ['I', 0]]
+1_2_list 15 teq [['Q'], ['I', 0]]
+1_2_list 16 sub [['Q'], ['I', 1], ['R', 0]]
+Step 63:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@16 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:3 ip@17 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		flip []
+	1_2_list id:4 ip@12 R:[0, 5] Q:[] coords:(4, 0) arg_buf:[]
+		+jmp [['LABEL', 'wait']]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@4 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:14 ip@4 R:[986, 0] Q:[] coords:(14, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:15 ip@4 R:[985, 0] Q:[] coords:(15, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:16 ip@1 R:[984, 0] Q:[] coords:(16, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+1_2_list id:2 recv message 5
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 put [['Q'], ['DIR', 'DIR']]
+1_2_list 3 flip []
+1_2_list 4 +jmp [['LABEL', 'wait']]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 teq [['Q'], ['I', 0]]
+1_2_list 14 teq [['Q'], ['I', 0]]
+1_2_list 15 teq [['Q'], ['I', 0]]
+1_2_list 16 teq [['R', 0], ['I', 0]]
+Step 64:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@16 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		put [['Q'], ['DIR', 'DIR']]
+	1_2_list id:2 ip@17 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		flip []
+	1_2_list id:3 ip@18 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		jmp [['LABEL', 'wait']]
+	1_2_list id:4 ip@4 R:[0, 5] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@4 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:14 ip@4 R:[986, 0] Q:[] coords:(14, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:15 ip@4 R:[985, 0] Q:[] coords:(15, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:16 ip@2 R:[984, 0] Q:[] coords:(16, 0) arg_buf:[]
+		-spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+_________________
+
+
+1_2_list id:1 recv message 5
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 put [['Q'], ['DIR', 'DIR']]
+1_2_list 2 flip []
+1_2_list 3 jmp [['LABEL', 'wait']]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 teq [['Q'], ['I', 0]]
+1_2_list 14 teq [['Q'], ['I', 0]]
+1_2_list 15 teq [['Q'], ['I', 0]]
+1_2_list 16 -spawn [['BOT', '1_2_list'], ['DIR', 'DIR']]
+[['BOT', '1_2_list'], ['DIR', 'DIR']]
+['DIR', 'DIR'] <class 'list'>
+LITERAL DIRECTION
+Spawning 1_2_list @ (17, 0)
+Step 65:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@11 R:[0, 0] Q:[] coords:(0, 0) arg_buf:[]
+		put [['Q'], ['R', 0]]
+	1_2_list id:1 ip@17 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		flip []
+	1_2_list id:2 ip@18 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		jmp [['LABEL', 'wait']]
+	1_2_list id:3 ip@4 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[0, 5] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@4 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:14 ip@4 R:[986, 0] Q:[] coords:(14, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:15 ip@4 R:[985, 0] Q:[] coords:(15, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:16 ip@3 R:[984, 0] Q:[] coords:(16, 0) arg_buf:[]
+		-put [['R', 0], ['DIR', 'DIR']]
+	1_2_list id:17 ip@0 R:[0, 0] Q:[] coords:(17, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+main_list_test id:0 recv message 5
+main_list_test 0 put [['Q'], ['R', 0]]
+1_2_list 1 flip []
+1_2_list 2 jmp [['LABEL', 'wait']]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 teq [['Q'], ['I', 0]]
+1_2_list 14 teq [['Q'], ['I', 0]]
+1_2_list 15 teq [['Q'], ['I', 0]]
+1_2_list 16 -put [['R', 0], ['DIR', 'DIR']]
+1_2_list 17 sub [['Q'], ['I', 1], ['R', 0]]
+Step 66:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@12 R:[5, 0] Q:[] coords:(0, 0) arg_buf:[]
+		teq [['R', 0], ['I', 5]]
+	1_2_list id:1 ip@18 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		jmp [['LABEL', 'wait']]
+	1_2_list id:2 ip@4 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[0, 5] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@4 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:14 ip@4 R:[986, 0] Q:[] coords:(14, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:15 ip@4 R:[985, 0] Q:[] coords:(15, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:16 ip@4 R:[984, 0] Q:[] coords:(16, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:17 ip@0 R:[0, 0] Q:[] coords:(17, 0) arg_buf:[]
+		sub [['Q'], ['I', 1], ['R', 0]]
+_________________
+
+
+1_2_list id:17 recv message 984
+main_list_test 0 teq [['R', 0], ['I', 5]]
+1_2_list 1 jmp [['LABEL', 'wait']]
+1_2_list 2 teq [['Q'], ['I', 0]]
+1_2_list 3 teq [['Q'], ['I', 0]]
+1_2_list 4 teq [['Q'], ['I', 0]]
+1_2_list 5 teq [['Q'], ['I', 0]]
+1_2_list 6 teq [['Q'], ['I', 0]]
+1_2_list 7 teq [['Q'], ['I', 0]]
+1_2_list 8 teq [['Q'], ['I', 0]]
+1_2_list 9 teq [['Q'], ['I', 0]]
+1_2_list 10 teq [['Q'], ['I', 0]]
+1_2_list 11 teq [['Q'], ['I', 0]]
+1_2_list 12 teq [['Q'], ['I', 0]]
+1_2_list 13 teq [['Q'], ['I', 0]]
+1_2_list 14 teq [['Q'], ['I', 0]]
+1_2_list 15 teq [['Q'], ['I', 0]]
+1_2_list 16 teq [['Q'], ['I', 0]]
+1_2_list 17 sub [['Q'], ['I', 1], ['R', 0]]
+Step 67:
+________________
+
+Bot Listing
+	main_list_test id:0 ip@13 R:[5, 0] Q:[] coords:(0, 0) arg_buf:[]
+		+exec [['BOT', 'EXIT_SUCCESS']]
+	1_2_list id:1 ip@4 R:[3, 0] Q:[] coords:(1, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:2 ip@4 R:[2, 0] Q:[] coords:(2, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:3 ip@4 R:[1, 0] Q:[] coords:(3, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:4 ip@4 R:[0, 5] Q:[] coords:(4, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:5 ip@4 R:[995, 0] Q:[] coords:(5, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:6 ip@4 R:[994, 0] Q:[] coords:(6, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:7 ip@4 R:[993, 0] Q:[] coords:(7, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:8 ip@4 R:[992, 0] Q:[] coords:(8, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:9 ip@4 R:[991, 0] Q:[] coords:(9, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:10 ip@4 R:[990, 0] Q:[] coords:(10, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:11 ip@4 R:[989, 0] Q:[] coords:(11, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:12 ip@4 R:[988, 0] Q:[] coords:(12, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:13 ip@4 R:[987, 0] Q:[] coords:(13, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:14 ip@4 R:[986, 0] Q:[] coords:(14, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:15 ip@4 R:[985, 0] Q:[] coords:(15, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:16 ip@4 R:[984, 0] Q:[] coords:(16, 0) arg_buf:[]
+		teq [['Q'], ['I', 0]]
+	1_2_list id:17 ip@1 R:[983, 0] Q:[] coords:(17, 0) arg_buf:[]
+		teq [['R', 0], ['I', 0]]
+_________________
+
+
+main_list_test 0 +exec [['BOT', 'EXIT_SUCCESS']]
+Execing EXIT_SUCCESS @ (0, 0)

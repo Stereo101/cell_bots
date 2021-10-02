@@ -1,0 +1,21 @@
+spawn STDOUT X+
+put 104 X+ #h
+put 101 X+ #e
+put 108 X+ #l
+put 108 X+ #l
+put 111 X+ #o
+put 32 X+ #
+put 119 X+ #w
+put 111 X+ #o
+put 114 X+ #r
+put 108 X+ #l
+put 100 X+ #d
+put 10 X+ #\n
+
+put 5 r0
+wait_loop:
+    teq r0 0
+    -sub r0 1 r0
+    -jmp wait_loop
+
+exec EXIT_SUCCESS

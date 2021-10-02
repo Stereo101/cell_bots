@@ -3,8 +3,8 @@ init:
     #   list size achieved
     sub Q 1 r0
     teq r0 0
-    -spawn 1_2_list X+
-    -put r0 X+
+    -spawn 1_2_list DIR
+    -put r0 DIR
 
 wait:
     teq Q 0     #read mode
@@ -14,15 +14,19 @@ wait:
 read:
     put Q r0
     teq r0 0
-    +put r1 X-
+    +flip
+    +put r1 DIR
+    +flip
     +jmp wait
 
     #pass message to next node
-    put 0 X+ 
-    sub r0 1 X+
+    put 0 DIR 
+    sub r0 1 DIR 
 
     #passback value from intended node
-    put Q X-
+    flip
+    put Q DIR 
+    flip
     jmp wait
 
 write:
@@ -31,7 +35,7 @@ write:
     +put Q r1   #save value
     +jmp wait
 
-    put 1 X+    #write mode=write
-    sub r0 1 X+ #index
-    put Q X+    #value
+    put 1 DIR    #write mode=write
+    sub r0 1 DIR #index
+    put Q DIR    #value
     jmp wait

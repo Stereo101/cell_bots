@@ -1,0 +1,3 @@
+#Just write the bytes forever...
+recv:
+    __WRITEBYTE__ Q
